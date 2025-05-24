@@ -1,4 +1,3 @@
-
 /*-----------------------------------*\
         copyright @Arun_Sanjeev
 \*-----------------------------------*/
@@ -1910,4 +1909,64 @@ textarea.form-input::-webkit-resizer { display: none; }
 
   .timeline-text { max-width: 700px; }
 
+}
+
+/* Responsive Design Adjustments */
+
+/* Mobile (≤480px) */
+@media (max-width: 480px) {
+  .container {
+    padding: 10px;
+    overflow-wrap: break-word;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  .flex-container {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* Tablet (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+  .grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+}
+
+/* Small Laptop (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container {
+    padding: 20px;
+  }
+  .grid-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Desktop (1025px - 1440px) */
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .container {
+    padding: 25px;
+  }
+  .grid-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Ultrawide (≥1440px) */
+@media (min-width: 1440px) {
+  .container {
+    padding: 30px;
+  }
+  .grid-container {
+    grid-template-columns: repeat(5, 1fr);
+  }
 }
