@@ -276,6 +276,174 @@ article.active {
   border-radius: 3px;
 }
 
+/* Resume Header Styles */
+.resume-section-header {
+  margin-bottom: 30px;
+}
+
+.resume-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 0;
+  padding-top: 0;
+}
+
+.download-resume-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, 
+    hsl(45, 100%, 72%) 0%, 
+    hsl(35, 100%, 68%) 100%);
+  color: var(--smoky-black);
+  text-decoration: none;
+  border-radius: 25px;
+  font-size: var(--fs-7);
+  font-weight: var(--fw-600);
+  box-shadow: 0 6px 20px hsla(45, 100%, 72%, 0.25);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid transparent;
+  white-space: nowrap;
+  min-width: fit-content;
+}
+
+.download-resume-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px hsla(45, 100%, 72%, 0.4);
+  background: linear-gradient(135deg, 
+    hsl(45, 100%, 75%) 0%, 
+    hsl(35, 100%, 70%) 100%);
+}
+
+.download-resume-btn:active {
+  transform: translateY(-1px);
+}
+
+.download-resume-btn:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.4), 
+    transparent);
+  transition: left 0.6s;
+}
+
+.download-resume-btn:hover:before {
+  left: 100%;
+}
+
+.download-resume-btn ion-icon {
+  font-size: 16px;
+  color: var(--smoky-black);
+}
+
+.download-resume-btn span {
+  font-weight: var(--fw-600);
+  letter-spacing: 0.5px;
+}
+
+/* Responsive adjustments for resume header */
+@media (min-width: 1024px) {
+  .resume-section-header {
+    margin-top: 0; /* Remove extra top margin */
+    margin-bottom: 40px;
+    padding-top: 60px; /* Use padding instead to push content down from navbar */
+  }
+  
+  .resume-header {
+    align-items: center;
+    gap: 30px;
+  }
+  
+  .download-resume-btn {
+    padding: 12px 24px;
+    font-size: var(--fs-6);
+    min-width: auto;
+  }
+  
+  .download-resume-btn ion-icon {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 1023px) and (min-width: 769px) {
+  .resume-section-header {
+    margin-top: 0;
+    margin-bottom: 35px;
+    padding-top: 20px;
+  }
+  
+  .resume-header {
+    gap: 25px;
+  }
+}
+
+@media (max-width: 768px) {
+  .resume-section-header {
+    margin-top: 0;
+    padding-top: 0;
+  }
+  
+  .resume-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+  }
+  
+  .resume-header .article-title {
+    margin-bottom: 0;
+  }
+  
+  .download-resume-btn {
+    padding: 10px 20px;
+    font-size: var(--fs-7);
+    width: auto;
+    min-width: 180px;
+  }
+}
+
+@media (max-width: 580px) {
+  .resume-header {
+    gap: 15px;
+  }
+  
+  .download-resume-btn {
+    padding: 8px 16px;
+    font-size: var(--fs-8);
+    min-width: 160px;
+    gap: 6px;
+  }
+  
+  .download-resume-btn ion-icon {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 450px) {
+  .resume-header {
+    gap: 12px;
+  }
+  
+  .download-resume-btn {
+    width: 100%;
+    max-width: 200px;
+    justify-content: center;
+    padding: 8px 12px;
+  }
+}
+
 .has-scrollbar::-webkit-scrollbar {
   width: 5px; /* for vertical scrollbar */
   height: 5px; /* for horizontal scrollbar */
