@@ -2407,3 +2407,75 @@ textarea.form-input::-webkit-resizer { display: none; }
     grid-template-columns: repeat(5, 1fr);
   }
 }
+
+@keyframes serviceMarqueeMobile {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-50% - 7px));
+  }
+}
+
+/* Mobile-only marquee style for "What i'm Pursuing" */
+@media (max-width: 768px) {
+  .service {
+    overflow: hidden;
+    padding-inline: 2px;
+    margin-bottom: 0;
+  }
+
+  .service .service-list.service-marquee-active {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    width: max-content;
+    padding-right: 8px;
+    animation: serviceMarqueeMobile 22s linear infinite;
+    will-change: transform;
+  }
+
+  .service .service-list.service-marquee-active:hover {
+    animation-play-state: paused;
+  }
+
+  .service .service-item {
+    min-width: fit-content;
+    max-width: none;
+    margin: 0;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .service .service-icon-box,
+  .service .arunicon {
+    display: none;
+  }
+
+  .service .service-content-box {
+    text-align: center;
+    display: block;
+  }
+
+  .service .service-item-title {
+    margin-bottom: 0;
+    line-height: 1.3;
+    font-size: var(--fs-7);
+    font-weight: var(--fw-400);
+    white-space: nowrap;
+  }
+
+  .service .service-item-text {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service .service-list.service-marquee-active {
+    animation: none !important;
+    transform: none !important;
+  }
+}

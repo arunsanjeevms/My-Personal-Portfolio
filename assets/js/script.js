@@ -278,6 +278,57 @@ const loadMediumPosts = async function () {
 loadMediumPosts();
 
 
+// mobile marquee for "What i'm Pursuing" service cards
+const setupMobileServiceMarquee = function () {
+  const serviceList = document.querySelector(".about .service-list");
+  if (!serviceList) return;
+
+  const mobileQuery = window.matchMedia("(max-width: 768px)");
+
+  const removeMarqueeClones = function () {
+    const clones = serviceList.querySelectorAll(".service-item[data-marquee-clone='true']");
+    for (let i = 0; i < clones.length; i++) {
+      clones[i].remove();
+    }
+
+    serviceList.dataset.marqueeCloned = "false";
+  }
+
+  const applyMarqueeState = function () {
+    if (mobileQuery.matches) {
+      if (serviceList.dataset.marqueeCloned !== "true") {
+        const originalItems = serviceList.querySelectorAll(".service-item:not([data-marquee-clone='true'])");
+
+        for (let i = 0; i < originalItems.length; i++) {
+          const clone = originalItems[i].cloneNode(true);
+          clone.dataset.marqueeClone = "true";
+          clone.setAttribute("aria-hidden", "true");
+          serviceList.appendChild(clone);
+        }
+
+        serviceList.dataset.marqueeCloned = "true";
+      }
+
+      serviceList.classList.add("service-marquee-active");
+      return;
+    }
+
+    serviceList.classList.remove("service-marquee-active");
+    removeMarqueeClones();
+  }
+
+  applyMarqueeState();
+
+  if (typeof mobileQuery.addEventListener === "function") {
+    mobileQuery.addEventListener("change", applyMarqueeState);
+  } else {
+    mobileQuery.addListener(applyMarqueeState);
+  }
+}
+
+setupMobileServiceMarquee();
+
+
 
 // lazy text reveal for resume, projects and blog
 const setupLazyReveal = function (pageSelector, targetSelector, watchDynamic = false) {
