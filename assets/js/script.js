@@ -136,6 +136,230 @@ for (let i = 0; i < formInputs.length; i++) {
 
 
 
+// dynamic medium blog variables
+const blogPostsList = document.querySelector("[data-blog-posts-list]");
+const mediumProfileUrl = "https://medium.com/@msarunsanjeev";
+const mediumFeedUrl = "https://medium.com/feed/@msarunsanjeev";
+const mediumFeedApiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(mediumFeedUrl)}`;
+
+const getPlainTextFromHtml = function (htmlContent) {
+  const tempContainer = document.createElement("div");
+  tempContainer.innerHTML = htmlContent || "";
+  return tempContainer.textContent.replace(/\s+/g, " ").trim();
+}
+
+const getMediumPostImage = function (post) {
+  if (post.thumbnail) return post.thumbnail;
+
+  const imageMatch = (post.description || post.content || "").match(/<img[^>]+src=["']([^"']+)["']/i);
+  if (imageMatch && imageMatch[1]) return imageMatch[1];
+
+  return "./assets/images/blog-1.jpg";
+}
+
+const formatMediumDate = function (dateValue) {
+  if (!dateValue) return "";
+
+  const parsedDate = new Date(dateValue);
+  if (Number.isNaN(parsedDate.getTime())) return "";
+
+  return parsedDate.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  });
+}
+
+const createBlogCard = function (post, isLatest = false) {
+  const postItem = document.createElement("li");
+  postItem.className = "blog-post-item";
+
+  const postLink = document.createElement("a");
+  postLink.href = post.link || mediumProfileUrl;
+  postLink.target = "_blank";
+  postLink.rel = "noopener noreferrer";
+
+  const bannerBox = document.createElement("figure");
+  bannerBox.className = "blog-banner-box";
+
+  const bannerImage = document.createElement("img");
+  bannerImage.src = getMediumPostImage(post);
+  bannerImage.alt = post.title || "Medium post";
+  bannerImage.loading = "lazy";
+  bannerBox.appendChild(bannerImage);
+
+  const contentBox = document.createElement("div");
+  contentBox.className = "blog-content";
+
+  const metaRow = document.createElement("div");
+  metaRow.className = "blog-meta";
+
+  const category = document.createElement("p");
+  category.className = "blog-category";
+  category.textContent = "Medium";
+
+  metaRow.appendChild(category);
+
+  if (isLatest) {
+    const latestBadge = document.createElement("span");
+    latestBadge.className = "blog-badge";
+    latestBadge.textContent = "Latest";
+    metaRow.appendChild(latestBadge);
+  }
+
+  const formattedDate = formatMediumDate(post.pubDate);
+  if (formattedDate) {
+    const dot = document.createElement("span");
+    dot.className = "dot";
+
+    const publishDate = document.createElement("time");
+    publishDate.dateTime = post.pubDate || "";
+    publishDate.textContent = formattedDate;
+
+    metaRow.append(dot, publishDate);
+  }
+
+  const title = document.createElement("h3");
+  title.className = "h3 blog-item-title";
+  title.textContent = post.title || "Read on Medium";
+
+  const excerpt = document.createElement("p");
+  excerpt.className = "blog-text";
+  const excerptText = getPlainTextFromHtml(post.description || post.content || "");
+  excerpt.textContent = excerptText.length > 170
+    ? `${excerptText.slice(0, 167)}...`
+    : (excerptText || "Open this article on Medium to read more.");
+
+  contentBox.append(title, excerpt, metaRow);
+  postLink.append(bannerBox, contentBox);
+  postItem.appendChild(postLink);
+
+  return postItem;
+}
+
+const renderBlogFallback = function () {
+  if (!blogPostsList) return;
+
+  blogPostsList.innerHTML = "";
+  blogPostsList.appendChild(createBlogCard({
+    title: "See all latest posts on Medium",
+    link: mediumProfileUrl,
+    pubDate: "",
+    thumbnail: "./assets/images/blog-2.jpg",
+    description: "Automatic sync is temporarily unavailable. Open my Medium profile to view every new article."
+  }));
+}
+
+const loadMediumPosts = async function () {
+  if (!blogPostsList) return;
+
+  try {
+    const response = await fetch(mediumFeedApiUrl);
+    if (!response.ok) throw new Error("Unable to fetch Medium feed");
+
+    const feedData = await response.json();
+    const posts = Array.isArray(feedData.items) ? feedData.items.slice(0, 6) : [];
+
+    if (!posts.length) {
+      renderBlogFallback();
+      return;
+    }
+
+    blogPostsList.innerHTML = "";
+    for (let i = 0; i < posts.length; i++) {
+      blogPostsList.appendChild(createBlogCard(posts[i], i === 0));
+    }
+  } catch (error) {
+    console.error("Medium sync error:", error);
+    renderBlogFallback();
+  }
+}
+
+loadMediumPosts();
+
+
+
+// lazy text reveal for resume, projects and blog
+const setupLazyReveal = function (pageSelector, targetSelector, watchDynamic = false) {
+  const page = document.querySelector(pageSelector);
+  if (!page) return;
+
+  let observer = null;
+
+  const bindRevealTargets = function () {
+    const revealTargets = page.querySelectorAll(targetSelector);
+
+    for (let i = 0; i < revealTargets.length; i++) {
+      const target = revealTargets[i];
+
+      if (target.dataset.revealInit === "true") continue;
+
+      target.dataset.revealInit = "true";
+      target.classList.add("scroll-reveal");
+      target.style.setProperty("--reveal-delay", `${(i % 4) * 0.06}s`);
+
+      if (observer) {
+        observer.observe(target);
+      }
+    }
+  }
+
+  const revealVisibleTargets = function () {
+    if (!page.classList.contains("active")) return;
+
+    const revealTargets = page.querySelectorAll(".scroll-reveal");
+
+    for (let i = 0; i < revealTargets.length; i++) {
+      if (revealTargets[i].classList.contains("is-visible")) continue;
+
+      const itemRect = revealTargets[i].getBoundingClientRect();
+      if (itemRect.top <= window.innerHeight * 0.9) {
+        revealTargets[i].classList.add("is-visible");
+      }
+    }
+  }
+
+  if ("IntersectionObserver" in window) {
+    observer = new IntersectionObserver(function (entries, observerInstance) {
+      for (let i = 0; i < entries.length; i++) {
+        if (entries[i].isIntersecting && page.classList.contains("active")) {
+          entries[i].target.classList.add("is-visible");
+          observerInstance.unobserve(entries[i].target);
+        }
+      }
+    }, {
+      threshold: 0.12,
+      rootMargin: "0px 0px -8% 0px"
+    });
+  }
+
+  const pageObserver = new MutationObserver(function () {
+    requestAnimationFrame(function () {
+      bindRevealTargets();
+      revealVisibleTargets();
+    });
+  });
+
+  pageObserver.observe(page, {
+    attributes: true,
+    attributeFilter: ["class"],
+    childList: watchDynamic,
+    subtree: watchDynamic
+  });
+
+  window.addEventListener("scroll", revealVisibleTargets, { passive: true });
+  window.addEventListener("resize", revealVisibleTargets);
+
+  bindRevealTargets();
+  revealVisibleTargets();
+}
+
+setupLazyReveal(".resume[data-page='resume']", ".timeline-item, .skills-title, .skills-item");
+setupLazyReveal(".projects[data-page='projects']", ".project-item.active", true);
+setupLazyReveal(".blog[data-page='blog']", ".blog-post-item", true);
+
+
+
 // page navigation variables
 const navigationLinks = document.querySelectorAll("[data-nav-link]");
 const pages = document.querySelectorAll("[data-page]");
