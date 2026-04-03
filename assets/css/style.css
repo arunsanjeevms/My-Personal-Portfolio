@@ -1765,6 +1765,10 @@ textarea.form-input::-webkit-resizer { display: none; }
 
   .about-text { margin-bottom: 40px; }
 
+  .about-signal-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   /* service */
 
   .service-item {
@@ -2115,6 +2119,10 @@ textarea.form-input::-webkit-resizer { display: none; }
    */
 
   /* service */
+
+  .about-signal-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 
   .service-list {
     grid-template-columns: 1fr 1fr;
