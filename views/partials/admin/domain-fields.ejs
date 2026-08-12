@@ -1,0 +1,105 @@
+<%# Shared field set for the add and edit domain forms.
+    Expects a `domain` object; pass an empty-ish object for "add". %>
+<div class="form-grid">
+
+  <div class="form-row">
+    <label class="form-label">Domain name <span class="req">*</span></label>
+    <input type="text" name="domain" value="<%= domain.domain || '' %>" class="form-input u-mono"
+           placeholder="arunsanjeev.dev" required>
+  </div>
+
+  <div class="form-row">
+    <label class="form-label">Registrar</label>
+    <input type="text" name="registrar" value="<%= domain.registrar || '' %>" class="form-input"
+           placeholder="GoDaddy, Namecheap, Cloudflare…">
+  </div>
+
+  <div class="form-row">
+    <label class="form-label">Registrar URL</label>
+    <input type="url" name="registrar_url" value="<%= domain.registrar_url || '' %>" class="form-input">
+  </div>
+
+  <div class="form-row">
+    <label class="form-label">Registered on</label>
+    <input type="date" name="registered_at"
+           value="<%= domain.registered_at ? String(domain.registered_at).slice(0,10) : '' %>" class="form-input">
+  </div>
+
+  <div class="form-row">
+    <label class="form-label">Expires on</label>
+    <input type="date" name="expires_at"
+           value="<%= domain.expires_at ? String(domain.expires_at).slice(0,10) : '' %>" class="form-input">
+    <p class="form-hint">Drives the expiry countdown and warnings.</p>
+  </div>
+
+  <div class="form-row">
+    <label class="form-label">DNS provider</label>
+    <input type="text" name="dns_provider" value="<%= domain.dns_provider || '' %>" class="form-input">
+  </div>
+
+  <div class="form-row">
+    <label class="form-label">Hosting provider</label>
+    <input type="text" name="hosting_provider" value="<%= domain.hosting_provider || '' %>" class="form-input">
+  </div>
+
+  <div class="form-row">
+    <label class="form-label">Server IP</label>
+    <input type="text" name="server_ip" value="<%= domain.server_ip || '' %>" class="form-input u-mono">
+  </div>
+
+  <div class="form-row">
+    <label class="form-label">Environment</label>
+    <select name="environment" class="form-select">
+      <% ['production','staging','development'].forEach(function (option) { %>
+        <option value="<%= option %>" <%= domain.environment === option ? 'selected' : '' %>><%= option %></option>
+      <% }); %>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <label class="form-label">SSL expires on</label>
+    <input type="date" name="ssl_expires_at"
+           value="<%= domain.ssl_expires_at ? String(domain.ssl_expires_at).slice(0,10) : '' %>" class="form-input">
+    <p class="form-hint">Filled in automatically by "Check SSL now".</p>
+  </div>
+
+  <div class="form-row" style="grid-column:1/-1">
+    <label class="form-label">Nameservers</label>
+    <textarea name="nameservers" rows="2" class="form-textarea u-mono"
+              placeholder="ns1.example.com&#10;ns2.example.com"><%= domain.nameservers || '' %></textarea>
+  </div>
+
+  <div class="form-row" style="grid-column:1/-1">
+    <label class="form-label">Notes</label>
+    <textarea name="notes" rows="2" class="form-textarea"><%= domain.notes || '' %></textarea>
+  </div>
+
+  <div class="form-row">
+    <div class="form-check">
+      <input type="checkbox" name="auto_renew" id="auto_renew_<%= domain.id || 'new' %>" <%= domain.auto_renew ? 'checked' : '' %>>
+      <label for="auto_renew_<%= domain.id || 'new' %>">Auto-renew is on at the registrar</label>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-check">
+      <input type="checkbox" name="ssl_enabled" id="ssl_enabled_<%= domain.id || 'new' %>" <%= domain.ssl_enabled ? 'checked' : '' %>>
+      <label for="ssl_enabled_<%= domain.id || 'new' %>">Uses HTTPS</label>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-check">
+      <input type="checkbox" name="is_primary" id="is_primary_<%= domain.id || 'new' %>" <%= domain.is_primary ? 'checked' : '' %>>
+      <label for="is_primary_<%= domain.id || 'new' %>">Primary domain</label>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-check">
+      <input type="checkbox" name="is_active" id="is_active_<%= domain.id || 'new' %>" <%= domain.is_active ? 'checked' : '' %>>
+      <label for="is_active_<%= domain.id || 'new' %>">Actively monitored</label>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,7 @@
+<%- include('./_shell', {
+  status: 404,
+  heading: "Page not found",
+  body: typeof message !== 'undefined' && message && 404 < 500 ? message : "The page you are looking for does not exist, or it may have moved.",
+  stack: typeof stack !== 'undefined' ? stack : null,
+  isAdminArea: typeof isAdminArea !== 'undefined' ? isAdminArea : false,
+}) %>

@@ -1,0 +1,263 @@
+<%- include('../partials/admin/head') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Security</h1>
+    <p class="page-subtitle">Two-factor authentication, active sessions and sign-in history.</p>
+  </div>
+</div>
+
+<%# ------------------------------------------------------ freshly issued codes %>
+<% if (backupCodes && backupCodes.length) { %>
+  <section class="card u-mb-0" style="margin-bottom:24px;border-color:var(--orange-yellow-crayola)">
+    <div class="card-header">
+      <h2 class="card-title u-accent">Save your backup codes now</h2>
+    </div>
+    <p class="u-small" style="line-height:1.7;margin-bottom:16px">
+      Each code works <strong>once</strong>, and they are the only way back in if you lose your
+      device. They are stored hashed, so this is the only time they can be shown —
+      print them or put them in a password manager before leaving this page.
+    </p>
+    <div class="u-mono" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px">
+      <% backupCodes.forEach(function (code) { %>
+        <span style="background:var(--smoky-black);border:1px solid var(--jet);border-radius:8px;
+                     padding:10px;text-align:center;letter-spacing:0.06em"><%= code %></span>
+      <% }); %>
+    </div>
+    <button type="button" class="btn btn-sm u-mt-16" data-copy="<%= backupCodes.join('\n') %>">
+      <ion-icon name="copy-outline"></ion-icon><span>Copy all</span>
+    </button>
+  </section>
+<% } %>
+
+<div class="grid grid-2">
+
+  <%# --------------------------------------------------- two-factor %>
+  <section class="card" id="two-factor">
+    <div class="card-header">
+      <h2 class="card-title">Two-factor authentication</h2>
+      <div class="card-header-actions">
+        <span class="badge badge-<%= twoFactor.enabled ? 'success' : 'warning' %>">
+          <%= twoFactor.enabled ? 'on' : 'off' %>
+        </span>
+      </div>
+    </div>
+
+    <% if (twoFactor.enabled) { %>
+      <div class="detail-list">
+        <div class="detail-row">
+          <span class="detail-label">Enabled</span>
+          <span class="detail-value"><%= h.formatDate(twoFactor.confirmedAt) %></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Last used</span>
+          <span class="detail-value"><%= twoFactor.lastUsedAt ? h.timeAgo(twoFactor.lastUsedAt) : 'never' %></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Backup codes left</span>
+          <span class="detail-value">
+            <%= twoFactor.remainingCodes %>
+            <% if (twoFactor.remainingCodes <= 2) { %>
+              <span class="badge badge-warning" style="margin-left:6px">running low</span>
+            <% } %>
+          </span>
+        </div>
+      </div>
+
+      <form method="POST" action="<%= adminPath %>/security/2fa/backup-codes" class="u-mt-16">
+        <%- csrfField() %>
+        <button type="submit" class="btn btn-block"
+                data-confirm="Your existing backup codes stop working immediately and a new set is issued."
+                data-confirm-title="Issue new backup codes?" data-confirm-action="Regenerate"
+                data-confirm-danger="false">
+          <ion-icon name="refresh-outline"></ion-icon><span>Regenerate backup codes</span>
+        </button>
+      </form>
+
+      <div class="card-header u-mt-24" style="margin-bottom:14px">
+        <h2 class="card-title" style="font-size:var(--fs-6)">Turn it off</h2>
+      </div>
+      <form method="POST" action="<%= adminPath %>/security/2fa/disable" data-guard>
+        <%- csrfField() %>
+        <div class="form-row">
+          <label class="form-label" for="disable-password">Confirm with your password</label>
+          <input type="password" id="disable-password" name="password" class="form-input"
+                 autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="btn btn-danger btn-block"
+                data-confirm="Your account will be protected by password alone."
+                data-confirm-title="Disable two-factor authentication?" data-confirm-action="Disable">
+          <ion-icon name="shield-outline"></ion-icon><span>Disable two-factor</span>
+        </button>
+      </form>
+
+    <% } else if (enrolment) { %>
+      <p class="u-small" style="line-height:1.7;margin-bottom:16px">
+        Scan this with Google Authenticator, Authy, 1Password or any TOTP app,
+        then enter the 6-digit code it shows to finish.
+      </p>
+
+      <%# The QR is drawn in the browser from the otpauth URI, so the
+          secret is never sent to a third-party QR service. %>
+      <div style="background:#fff;padding:14px;border-radius:12px;display:inline-block;margin-bottom:16px">
+        <img src="<%= enrolment.qr %>" alt="QR code for two-factor setup" width="180" height="180">
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">Or enter this key by hand</label>
+        <div class="input-group">
+          <input type="text" class="form-input u-mono" value="<%= enrolment.secret %>" readonly>
+          <button type="button" class="input-action" data-copy="<%= enrolment.secret %>" aria-label="Copy key">
+            <ion-icon name="copy-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
+
+      <form method="POST" action="<%= adminPath %>/security/2fa/confirm" data-guard>
+        <%- csrfField() %>
+        <div class="form-row">
+          <label class="form-label" for="token">Code from your app</label>
+          <input type="text" id="token" name="token" class="form-input u-mono"
+                 style="letter-spacing:0.2em;text-align:center" inputmode="numeric"
+                 placeholder="000000" maxlength="6" autocomplete="one-time-code" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">
+          <ion-icon name="checkmark-outline"></ion-icon><span>Confirm and enable</span>
+        </button>
+      </form>
+
+    <% } else { %>
+      <p class="u-small u-muted" style="line-height:1.75;margin-bottom:18px">
+        With two-factor on, a stolen password is not enough to reach your admin panel —
+        a code from your phone is required as well. Your secret is stored encrypted, and
+        you get ten single-use backup codes in case you lose the device.
+      </p>
+
+      <form method="POST" action="<%= adminPath %>/security/2fa/begin">
+        <%- csrfField() %>
+        <button type="submit" class="btn btn-primary btn-block">
+          <ion-icon name="shield-checkmark-outline"></ion-icon><span>Set up two-factor</span>
+        </button>
+      </form>
+    <% } %>
+  </section>
+
+  <%# ------------------------------------------------- sign-in history %>
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title">Sign-in activity (24h)</h2>
+    </div>
+
+    <div class="grid grid-3" style="gap:10px;margin-bottom:16px">
+      <div>
+        <p class="stat-value" style="font-size:var(--fs-2)"><%= summary.total || 0 %></p>
+        <p class="stat-label">Attempts</p>
+      </div>
+      <div>
+        <p class="stat-value" style="font-size:var(--fs-2);color:var(--admin-success)"><%= summary.successes || 0 %></p>
+        <p class="stat-label">Successful</p>
+      </div>
+      <div>
+        <p class="stat-value" style="font-size:var(--fs-2);color:<%= Number(summary.failures) > 10 ? 'var(--admin-danger)' : 'var(--light-gray)' %>">
+          <%= summary.failures || 0 %>
+        </p>
+        <p class="stat-label">Failed</p>
+      </div>
+    </div>
+
+    <% if (Number(summary.failures) > 10) { %>
+      <div class="alert alert-warning">
+        <ion-icon name="warning-outline"></ion-icon>
+        <div class="alert-body">
+          <%= summary.failures %> failed attempts from <%= summary.distinct_sources %> source(s).
+          Accounts lock automatically after
+          <%= settings.login_max_attempts || 5 %> failures.
+        </div>
+      </div>
+    <% } %>
+
+    <div class="table-wrap" style="max-height:340px;overflow-y:auto">
+      <table class="data-table" style="min-width:auto">
+        <thead><tr><th>Account</th><th>Result</th><th>When</th></tr></thead>
+        <tbody>
+          <% if (attempts.length) { %>
+            <% attempts.forEach(function (attempt) { %>
+              <tr>
+                <td class="u-small"><%= h.truncate(attempt.email || 'unknown', 24) %></td>
+                <td>
+                  <span class="badge badge-<%= attempt.success ? 'success' : 'danger' %>">
+                    <%= attempt.success ? 'ok' : (attempt.reason || 'failed') %>
+                  </span>
+                </td>
+                <td class="cell-muted u-small"><%= h.timeAgo(attempt.created_at) %></td>
+              </tr>
+            <% }); %>
+          <% } else { %>
+            <tr><td colspan="3" class="cell-muted u-small">No sign-in attempts recorded.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="form-hint u-mt-16">
+      Source addresses are stored only as a salted hash, so this list cannot be used to
+      identify anyone by IP.
+    </p>
+  </section>
+</div>
+
+<%# ------------------------------------------------------ sessions %>
+<section class="card u-mt-24">
+  <div class="card-header">
+    <h2 class="card-title">Active sessions</h2>
+    <div class="card-header-actions">
+      <% if (sessions.length > 1) { %>
+        <form method="POST" action="<%= adminPath %>/security/sessions/revoke-others" style="display:inline">
+          <%- csrfField() %>
+          <button type="submit" class="btn btn-sm btn-danger"
+                  data-confirm="Every other device signed in to this admin panel will be signed out. Your current session stays active."
+                  data-confirm-title="Sign out other sessions?" data-confirm-action="Sign them out">
+            <ion-icon name="log-out-outline"></ion-icon><span>Sign out others</span>
+          </button>
+        </form>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Account</th><th>Role</th><th>Started</th><th>Expires</th><th style="text-align:right">Action</th></tr></thead>
+      <tbody>
+        <% sessions.forEach(function (session) { %>
+          <tr>
+            <td>
+              <span class="cell-strong"><%= session.userName %></span>
+              <% if (session.isCurrent) { %>
+                <span class="badge badge-accent" style="margin-left:6px">this device</span>
+              <% } %>
+              <br><span class="cell-muted u-small"><%= session.userEmail %></span>
+            </td>
+            <td class="cell-muted"><%= session.role %></td>
+            <td class="cell-muted"><%= session.createdAt ? h.timeAgo(session.createdAt) : '—' %></td>
+            <td class="cell-muted"><%= h.formatDateTime(session.expiresAt) %></td>
+            <td class="cell-actions">
+              <% if (!session.isCurrent) { %>
+                <form method="POST" action="<%= adminPath %>/security/sessions/<%= session.id %>/revoke" style="display:inline">
+                  <%- csrfField() %>
+                  <button type="submit" class="btn btn-sm btn-danger">
+                    <ion-icon name="close-outline"></ion-icon>
+                  </button>
+                </form>
+              <% } else { %>
+                <span class="cell-muted u-small">—</span>
+              <% } %>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<%- include('../partials/admin/foot') %>

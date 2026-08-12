@@ -1,0 +1,114 @@
+<%- include('../partials/admin/head') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Page sections</h1>
+    <p class="page-subtitle">Turn sections on or off, rename their headings, and change their order.</p>
+  </div>
+</div>
+
+<form method="POST" action="<%= adminPath %>/sections" data-guard>
+  <%- csrfField() %>
+
+  <% let firstPage = true; %>
+  <% byPage.forEach(function (sections, pageKey) { %>
+    <section class="card <%= firstPage ? '' : 'u-mt-24' %>">
+      <% firstPage = false; %>
+      <div class="card-header">
+        <h2 class="card-title" style="text-transform:capitalize"><%= pageKey %> tab</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width:90px">Shown</th>
+              <th>Section</th>
+              <th>Heading</th>
+              <th style="width:100px">Order</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% sections.forEach(function (section) { %>
+              <tr>
+                <td>
+                  <% if (section.is_locked) { %>
+                    <span class="badge" title="This section is structural and cannot be hidden">
+                      <ion-icon name="lock-closed-outline"></ion-icon> always
+                    </span>
+                  <% } else { %>
+                    <div class="form-check">
+                      <input type="checkbox" id="enabled_<%= section.id %>" name="enabled_<%= section.id %>"
+                             <%= section.is_enabled ? 'checked' : '' %>>
+                      <label for="enabled_<%= section.id %>" class="sr-only">Show <%= section.label %></label>
+                    </div>
+                  <% } %>
+                </td>
+                <td class="cell-strong">
+                  <%= section.label %>
+                  <% if (section.icon_name) { %>
+                    <ion-icon name="<%= section.icon_name %>" style="vertical-align:middle;color:var(--light-gray-70)"></ion-icon>
+                  <% } %>
+                </td>
+                <td>
+                  <input type="text" name="title_<%= section.id %>" value="<%= section.title || '' %>"
+                         class="form-input" placeholder="(no heading)" style="min-width:200px">
+                </td>
+                <td>
+                  <input type="number" name="order_<%= section.id %>" value="<%= section.sort_order %>"
+                         class="form-input" style="width:80px">
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% }); %>
+
+  <div class="u-flex u-gap-12 u-mt-24">
+    <button type="submit" class="btn btn-primary">
+      <ion-icon name="save-outline"></ion-icon><span>Save sections</span>
+    </button>
+  </div>
+</form>
+
+<%# ---------------------------------------------------- feature flags %>
+<section class="card u-mt-24">
+  <div class="card-header">
+    <h2 class="card-title">Feature flags</h2>
+    <div class="card-header-actions">
+      <span class="badge"><%= flags.filter(function (f) { return f.is_enabled; }).length %> / <%= flags.length %> on</span>
+    </div>
+  </div>
+
+  <p class="u-small u-muted" style="margin-bottom:16px;line-height:1.7">
+    Switch whole features on and off without touching code. Turning something off hides it from
+    the public site immediately; the content stays in the database untouched.
+  </p>
+
+  <form method="POST" action="<%= adminPath %>/sections/flags" data-guard>
+    <%- csrfField() %>
+
+    <div class="form-grid">
+      <% flags.forEach(function (flag) { %>
+        <div class="form-row">
+          <div class="form-check">
+            <input type="checkbox" id="flag_<%= flag.flag_key %>" name="<%= flag.flag_key %>"
+                   <%= flag.is_enabled ? 'checked' : '' %>>
+            <label for="flag_<%= flag.flag_key %>"><%= flag.label %></label>
+          </div>
+          <% if (flag.description) { %>
+            <p class="form-hint"><%= flag.description %></p>
+          <% } %>
+        </div>
+      <% }); %>
+    </div>
+
+    <button type="submit" class="btn btn-primary u-mt-16">
+      <ion-icon name="toggle-outline"></ion-icon><span>Save feature flags</span>
+    </button>
+  </form>
+</section>
+
+<%- include('../partials/admin/foot') %>

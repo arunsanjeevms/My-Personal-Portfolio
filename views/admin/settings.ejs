@@ -1,0 +1,203 @@
+<%- include('../partials/admin/head') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Settings</h1>
+    <p class="page-subtitle">Everything the site shows, without touching code.</p>
+  </div>
+</div>
+
+<%# Settings search - filters the tab list as you type. %>
+<div class="card" style="padding:14px 16px;margin-bottom:18px">
+  <div class="topbar-search" style="width:100%;display:flex">
+    <ion-icon name="search-outline"></ion-icon>
+    <label class="sr-only" for="settings-search">Search settings</label>
+    <input type="search" id="settings-search" data-settings-search
+           placeholder="Search settings — try &quot;favicon&quot;, &quot;SMTP&quot;, &quot;title&quot;…">
+  </div>
+  <div class="settings-results u-hidden" data-settings-results></div>
+</div>
+
+<div class="settings-layout">
+
+  <nav class="settings-tabs" aria-label="Settings sections">
+    <% Object.entries(groupLabels).forEach(function (entry) {
+         const key = entry[0], label = entry[1];
+         if (!grouped.has(key)) return; %>
+      <a href="<%= adminPath %>/settings?group=<%= key %>"
+         class="settings-tab <%= activeGroup === key ? 'is-active' : '' %>"
+         data-settings-tab="<%= key %>">
+        <span><%= label %></span>
+        <span class="nav-badge"><%= grouped.get(key).length %></span>
+      </a>
+    <% }); %>
+  </nav>
+
+  <div class="settings-panel">
+    <% const rows = grouped.get(activeGroup) || []; %>
+
+    <% if (activeGroup === 'status') { %>
+      <div class="alert alert-warning">
+        <ion-icon name="warning-outline"></ion-icon>
+        <div class="alert-body">
+          <div class="alert-title">These settings change what visitors see</div>
+          Setting the status to <strong>private</strong> or <strong>maintenance</strong> hides the
+          site from the public and tells search engines not to index it.
+        </div>
+      </div>
+    <% } %>
+
+    <% if (activeGroup === 'mail' && !mailConfigured) { %>
+      <div class="alert alert-info">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        <div class="alert-body">
+          <div class="alert-title">SMTP is not configured yet</div>
+          Contact form notifications and password reset emails will not be delivered until
+          a host and from-address are set. Everything else works without it.
+        </div>
+      </div>
+    <% } %>
+
+    <form method="POST" action="<%= adminPath %>/settings" data-guard>
+      <%- csrfField() %>
+      <input type="hidden" name="_group" value="<%= activeGroup %>">
+
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title"><%= groupLabels[activeGroup] %></h2>
+        </div>
+
+        <div class="form-grid">
+          <% rows.forEach(function (row) { %>
+            <%
+              const isWide = ['text', 'html', 'json'].includes(row.value_type)
+                || row.setting_key === 'google_maps_url';
+            %>
+            <div class="form-row setting-row" style="<%= isWide ? 'grid-column:1/-1' : '' %>"
+                 data-setting-key="<%= row.setting_key %>"
+                 data-setting-label="<%= row.label || row.setting_key %>">
+
+              <% if (row.value_type !== 'boolean') { %>
+                <label class="form-label" for="set-<%= row.setting_key %>"><%= row.label || row.setting_key %></label>
+              <% } %>
+
+              <% if (row.value_type === 'boolean') { %>
+                <div class="form-check">
+                  <input type="checkbox" id="set-<%= row.setting_key %>" name="<%= row.setting_key %>"
+                         <%= row.setting_value === '1' ? 'checked' : '' %>>
+                  <label for="set-<%= row.setting_key %>"><%= row.label || row.setting_key %></label>
+                </div>
+
+              <% } else if (row.value_type === 'media') { %>
+                <div class="media-field" data-media-field>
+                  <input type="hidden" id="set-<%= row.setting_key %>" name="<%= row.setting_key %>"
+                         value="<%= row.setting_value || '' %>" data-media-input>
+                  <div class="media-preview" data-media-preview>
+                    <% if (row.setting_value && media[row.setting_value]) { %>
+                      <img src="<%= media[row.setting_value].url_path %>" alt="">
+                    <% } else { %>
+                      <span class="media-placeholder"><ion-icon name="image-outline"></ion-icon></span>
+                    <% } %>
+                  </div>
+                  <div class="u-flex u-gap-8">
+                    <button type="button" class="btn btn-sm" data-media-pick data-accept="image">
+                      <ion-icon name="images-outline"></ion-icon><span>Choose</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-ghost" data-media-clear
+                            <%= row.setting_value ? '' : 'hidden' %>>
+                      <ion-icon name="close-outline"></ion-icon><span>Remove</span>
+                    </button>
+                  </div>
+                </div>
+
+              <% } else if (row.value_type === 'color') { %>
+                <div class="u-flex u-gap-8 u-items-center">
+                  <input type="color" name="<%= row.setting_key %>" id="set-<%= row.setting_key %>"
+                         value="<%= row.setting_value || '#111318' %>"
+                         style="width:52px;height:38px;padding:3px;border:1px solid var(--jet);border-radius:8px;background:var(--eerie-black-1)">
+                  <input type="text" class="form-input u-mono" value="<%= row.setting_value || '' %>"
+                         data-color-mirror="set-<%= row.setting_key %>" style="flex:1">
+                </div>
+
+              <% } else if (row.value_type === 'text') { %>
+                <textarea id="set-<%= row.setting_key %>" name="<%= row.setting_key %>" rows="3"
+                          class="form-textarea"><%= row.setting_value || '' %></textarea>
+
+              <% } else if (row.value_type === 'select' && row.setting_key === 'site_status') { %>
+                <select id="set-<%= row.setting_key %>" name="<%= row.setting_key %>" class="form-select">
+                  <% ['published', 'private', 'maintenance'].forEach(function (option) { %>
+                    <option value="<%= option %>" <%= row.setting_value === option ? 'selected' : '' %>>
+                      <%= option.charAt(0).toUpperCase() + option.slice(1) %>
+                    </option>
+                  <% }); %>
+                </select>
+
+              <% } else if (row.value_type === 'number') { %>
+                <input type="number" id="set-<%= row.setting_key %>" name="<%= row.setting_key %>"
+                       value="<%= row.setting_value || '' %>" class="form-input">
+
+              <% } else if (row.is_secret) { %>
+                <input type="password" id="set-<%= row.setting_key %>" name="<%= row.setting_key %>"
+                       value="" class="form-input" autocomplete="new-password"
+                       placeholder="<%= row.has_value ? '•••••••• (unchanged)' : 'Not set' %>">
+                <p class="form-hint">
+                  Stored securely and never shown again. Leave blank to keep the current value.
+                </p>
+
+              <% } else { %>
+                <input type="text" id="set-<%= row.setting_key %>" name="<%= row.setting_key %>"
+                       value="<%= row.setting_value || '' %>" class="form-input">
+              <% } %>
+
+              <% if (row.description) { %>
+                <p class="form-hint"><%= row.description %></p>
+              <% } %>
+            </div>
+          <% }); %>
+        </div>
+      </section>
+
+      <div class="u-flex u-gap-12 u-mt-24">
+        <button type="submit" class="btn btn-primary">
+          <ion-icon name="save-outline"></ion-icon><span>Save <%= groupLabels[activeGroup].toLowerCase() %></span>
+        </button>
+      </div>
+    </form>
+
+    <% if (activeGroup === 'mail') { %>
+      <section class="card u-mt-24">
+        <div class="card-header"><h2 class="card-title">Send a test email</h2></div>
+        <form method="POST" action="<%= adminPath %>/settings/test-email" data-guard>
+          <%- csrfField() %>
+          <div class="u-flex u-gap-12" style="flex-wrap:wrap;align-items:flex-end">
+            <div class="form-row u-mb-0" style="flex:1;min-width:220px;margin-bottom:0">
+              <label class="form-label" for="test-to">Send to</label>
+              <input type="email" id="test-to" name="to" class="form-input"
+                     value="<%= currentUser.email %>" required>
+            </div>
+            <button type="submit" class="btn">
+              <ion-icon name="paper-plane-outline"></ion-icon><span>Send test</span>
+            </button>
+          </div>
+          <p class="form-hint u-mt-8">Save your SMTP settings first, then send a test to confirm they work.</p>
+        </form>
+      </section>
+    <% } %>
+
+    <% if (activeGroup === 'titles') { %>
+      <section class="card u-mt-24">
+        <div class="card-header"><h2 class="card-title">How titles are built</h2></div>
+        <p class="u-small u-muted" style="line-height:1.7">
+          The template accepts <code>%page%</code>, <code>%site%</code> and <code>%name%</code>.
+          For example <code>%page% | %site%</code> renders the projects tab as
+          <strong>Projects | <%= currentUser.name %></strong>.
+          The home page uses its own title verbatim rather than the template, so your
+          main search result stays exactly as you wrote it.
+        </p>
+      </section>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/admin/media-picker') %>
+<%- include('../partials/admin/foot') %>

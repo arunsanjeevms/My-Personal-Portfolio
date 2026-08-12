@@ -1,0 +1,66 @@
+<%# Blog list.
+
+    The original site fetched the Medium RSS feed from the browser via
+    api.rss2json.com on every page load. That is now synced server-side
+    into blog_posts on a schedule, so the page renders instantly, works
+    without JavaScript, and does not break when a third-party API is
+    rate-limited or down. %>
+<ul class="blog-posts-list" data-blog-posts-list>
+  <% if (posts && posts.length) { %>
+    <% posts.forEach(function (post, index) { %>
+      <%
+        const href = post.source === 'medium'
+          ? post.external_url
+          : ('/blog/' + post.slug);
+        const image = post.image ? post.image.url_path
+          : (post.featured_image_url || '/assets/images/blog-' + ((index % 6) + 1) + '.jpg');
+      %>
+      <li class="blog-post-item">
+        <a href="<%= href %>"
+           <%= post.source === 'medium' ? 'target="_blank" rel="noopener noreferrer"' : '' %>>
+
+          <figure class="blog-banner-box">
+            <img src="<%= image %>" alt="<%= post.title %>" loading="lazy">
+          </figure>
+
+          <div class="blog-content">
+            <h3 class="h3 blog-item-title"><%= post.title %></h3>
+
+            <p class="blog-text"><%= h.truncate(post.excerpt || '', 170) %></p>
+
+            <div class="blog-meta">
+              <p class="blog-category"><%= post.category_name || (post.source === 'medium' ? 'Medium' : 'Article') %></p>
+
+              <% if (index === 0 && post.published_at) { %>
+                <span class="blog-badge">Latest</span>
+              <% } %>
+
+              <% if (post.published_at) { %>
+                <span class="dot"></span>
+                <time datetime="<%= new Date(post.published_at).toISOString() %>">
+                  <%= h.formatDate(post.published_at) %>
+                </time>
+              <% } %>
+            </div>
+          </div>
+        </a>
+      </li>
+    <% }); %>
+  <% } else { %>
+    <%# Graceful fallback: never an empty tab. %>
+    <li class="blog-post-item">
+      <a href="<%= settings.medium_profile_url || '#' %>" target="_blank" rel="noopener noreferrer">
+        <figure class="blog-banner-box">
+          <img src="/assets/images/blog-2.jpg" alt="Latest posts" loading="lazy">
+        </figure>
+        <div class="blog-content">
+          <h3 class="h3 blog-item-title">See the latest posts</h3>
+          <p class="blog-text">New articles will appear here as they are published.</p>
+          <div class="blog-meta">
+            <p class="blog-category">Medium</p>
+          </div>
+        </div>
+      </a>
+    </li>
+  <% } %>
+</ul>

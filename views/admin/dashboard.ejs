@@ -1,0 +1,266 @@
+<%- include('../partials/admin/head') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Welcome back, <%= currentUser.name.split(' ')[0] %></h1>
+    <p class="page-subtitle">
+      Here is what is happening across your portfolio.
+    </p>
+  </div>
+  <div class="page-header-actions">
+    <a href="<%= siteUrl %>" target="_blank" rel="noopener" class="btn">
+      <ion-icon name="open-outline"></ion-icon><span>View site</span>
+    </a>
+  </div>
+</div>
+
+<%# ---------------------------------------------------------- stat tiles %>
+<div class="grid grid-stats">
+
+  <div class="stat">
+    <span class="stat-icon"><ion-icon name="people-outline"></ion-icon></span>
+    <div>
+      <% if (visitors.configured) { %>
+        <p class="stat-value"><%= h.formatNumber(visitors.visitors_today) %></p>
+        <p class="stat-label">Visitors today</p>
+        <p class="stat-meta"><%= h.formatNumber(visitors.visitors_week) %> in the last 7 days</p>
+      <% } else { %>
+        <p class="stat-value u-muted">—</p>
+        <p class="stat-label">Visitors today</p>
+        <p class="stat-meta">Analytics starts collecting in phase 5</p>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="stat">
+    <span class="stat-icon"><ion-icon name="eye-outline"></ion-icon></span>
+    <div>
+      <% if (visitors.configured) { %>
+        <p class="stat-value"><%= h.formatNumber(visitors.views_today) %></p>
+        <p class="stat-label">Page views today</p>
+      <% } else { %>
+        <p class="stat-value u-muted">—</p>
+        <p class="stat-label">Page views today</p>
+        <p class="stat-meta">Not collecting yet</p>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="stat">
+    <span class="stat-icon"><ion-icon name="mail-outline"></ion-icon></span>
+    <div>
+      <p class="stat-value"><%= h.formatNumber(counts.messages_unread || 0) %></p>
+      <p class="stat-label">Unread messages</p>
+      <p class="stat-meta"><%= h.formatNumber(counts.messages || 0) %> total received</p>
+    </div>
+  </div>
+
+  <div class="stat">
+    <span class="stat-icon"><ion-icon name="cube-outline"></ion-icon></span>
+    <div>
+      <p class="stat-value"><%= h.formatNumber(counts.projects || 0) %></p>
+      <p class="stat-label">Projects</p>
+      <p class="stat-meta"><%= h.formatNumber(counts.projects_published || 0) %> published</p>
+    </div>
+  </div>
+
+</div>
+
+<%# --------------------------------------------------- content + health %>
+<div class="grid grid-2 u-mt-24">
+
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title">Content</h2>
+      <div class="card-header-actions">
+        <span class="badge <%= (counts.projects || 0) > 0 ? 'badge-success' : 'badge-warning' %>">
+          <%= (counts.projects || 0) > 0 ? 'Migrated' : 'Awaiting phase 3' %>
+        </span>
+      </div>
+    </div>
+
+    <div class="detail-list">
+      <div class="detail-row">
+        <span class="detail-label">Experience entries</span>
+        <span class="detail-value"><%= h.formatNumber(counts.experience || 0) %></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Education entries</span>
+        <span class="detail-value"><%= h.formatNumber(counts.education || 0) %></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Certifications</span>
+        <span class="detail-value"><%= h.formatNumber(counts.certifications || 0) %></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Achievements</span>
+        <span class="detail-value"><%= h.formatNumber(counts.achievements || 0) %></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Skills</span>
+        <span class="detail-value"><%= h.formatNumber(counts.skills || 0) %></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Services</span>
+        <span class="detail-value"><%= h.formatNumber(counts.services || 0) %></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Social links</span>
+        <span class="detail-value"><%= h.formatNumber(counts.social_links || 0) %></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Media files</span>
+        <span class="detail-value"><%= h.formatNumber(counts.media || 0) %></span>
+      </div>
+    </div>
+
+    <% if (!counts.projects) { %>
+      <div class="alert alert-info u-mt-16 u-mb-0">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        <div class="alert-body">
+          <div class="alert-title">Content not migrated yet</div>
+          Phase 3 imports everything from your existing <code>index.html</code> into these tables.
+        </div>
+      </div>
+    <% } %>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title">System health</h2>
+      <div class="card-header-actions">
+        <span class="badge badge-<%= health.status === 'healthy' ? 'success' : health.status === 'warning' ? 'warning' : 'danger' %>">
+          <span class="status-dot is-<%= health.status %>"></span>
+          <%= health.status %>
+        </span>
+      </div>
+    </div>
+
+    <div class="detail-list">
+      <div class="detail-row">
+        <span class="detail-label">Database</span>
+        <span class="detail-value">
+          <span class="status-dot is-<%= health.checks.database.status %>"></span>
+          <%= health.checks.database.label %>
+        </span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Database size</span>
+        <span class="detail-value"><%= h.formatBytes(health.database.bytes) %> · <%= health.database.tables %> tables</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Memory</span>
+        <span class="detail-value"><%= health.memory.systemPercent %>% of <%= h.formatBytes(health.memory.systemTotalBytes) %></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Uptime</span>
+        <span class="detail-value"><%= h.formatDuration(health.application.uptimeSeconds) %></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Node.js</span>
+        <span class="detail-value u-mono"><%= health.application.nodeVersion %></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Environment</span>
+        <span class="detail-value"><%= health.application.environment %></span>
+      </div>
+      <% if (health.application.gitCommit) { %>
+        <div class="detail-row">
+          <span class="detail-label">Git commit</span>
+          <span class="detail-value u-mono"><%= health.application.gitCommit %></span>
+        </div>
+      <% } %>
+    </div>
+
+    <a href="<%= adminPath %>/system" class="btn btn-block u-mt-16">
+      <ion-icon name="pulse-outline"></ion-icon><span>Full system report</span>
+    </a>
+  </section>
+
+</div>
+
+<%# ------------------------------------------------ domains + activity %>
+<div class="grid grid-2 u-mt-24">
+
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title">Domains &amp; SSL</h2>
+    </div>
+
+    <% if (domains.configured) { %>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Domain</th><th>Expires</th><th>SSL</th></tr>
+          </thead>
+          <tbody>
+            <% domains.domains.forEach(function (domain) { %>
+              <tr>
+                <td class="cell-strong"><%= domain.domain %></td>
+                <td>
+                  <% if (domain.days_to_expiry === null) { %>
+                    <span class="cell-muted">Not set</span>
+                  <% } else { %>
+                    <span class="badge badge-<%= domain.days_to_expiry <= 7 ? 'danger' : domain.days_to_expiry <= 30 ? 'warning' : 'success' %>">
+                      <%= domain.days_to_expiry < 0 ? 'Expired' : domain.days_to_expiry + ' days' %>
+                    </span>
+                  <% } %>
+                </td>
+                <td><span class="badge badge-<%= domain.ssl_status === 'valid' ? 'success' : 'warning' %>"><%= domain.ssl_status %></span></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div class="empty-state">
+        <div class="empty-icon"><ion-icon name="globe-outline"></ion-icon></div>
+        <p class="empty-title">No domains tracked</p>
+        <p class="empty-text">
+          Domain and SSL expiry tracking arrives in phase 6. You will add
+          <strong>arunsanjeev.dev</strong> and any other domains there.
+        </p>
+      </div>
+    <% } %>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title">Recent activity</h2>
+      <div class="card-header-actions">
+        <% if (loginSummary && Number(loginSummary.failures) > 0) { %>
+          <span class="badge badge-warning" title="Failed sign-ins in the last 24 hours">
+            <ion-icon name="shield-outline"></ion-icon>
+            <%= loginSummary.failures %> failed sign-in<%= Number(loginSummary.failures) === 1 ? '' : 's' %>
+          </span>
+        <% } %>
+      </div>
+    </div>
+
+    <% if (recentActivity && recentActivity.length) { %>
+      <div>
+        <% recentActivity.forEach(function (item) { %>
+          <div class="activity-item is-<%= item.severity %>">
+            <span class="activity-dot"><ion-icon name="ellipse-outline"></ion-icon></span>
+            <div>
+              <p class="activity-text">
+                <strong style="color:var(--white-2)"><%= item.user_name || 'system' %></strong>
+                <%= item.description || item.action %>
+              </p>
+              <p class="activity-meta"><%= item.action %> · <%= h.timeAgo(item.created_at) %></p>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <div class="empty-state">
+        <div class="empty-icon"><ion-icon name="list-outline"></ion-icon></div>
+        <p class="empty-title">Nothing logged yet</p>
+        <p class="empty-text">Every admin action is recorded here with a full before/after trail.</p>
+      </div>
+    <% } %>
+  </section>
+
+</div>
+
+<%- include('../partials/admin/foot') %>

@@ -1,0 +1,114 @@
+<%- include('../partials/admin/head') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Activity logs</h1>
+    <p class="page-subtitle">
+      <%= h.formatNumber(result.total) %> recorded action<%= result.total === 1 ? '' : 's' %>
+    </p>
+  </div>
+</div>
+
+<form method="GET" action="<%= adminPath %>/activity-logs" class="card" style="padding:14px 16px;margin-bottom:18px">
+  <div class="u-flex u-gap-12" style="flex-wrap:wrap">
+    <div class="topbar-search" style="width:auto;flex:1;min-width:180px;display:flex">
+      <ion-icon name="search-outline"></ion-icon>
+      <label class="sr-only" for="q">Search logs</label>
+      <input type="search" id="q" name="q" value="<%= filters.q %>" placeholder="Search description or user…">
+    </div>
+
+    <select name="user" class="form-select" style="width:auto;min-width:140px" aria-label="User">
+      <option value="">All users</option>
+      <% users.forEach(function (user) { %>
+        <option value="<%= user.id %>" <%= String(filters.user) === String(user.id) ? 'selected' : '' %>><%= user.name %></option>
+      <% }); %>
+    </select>
+
+    <select name="action" class="form-select" style="width:auto;min-width:150px" aria-label="Action">
+      <option value="">All actions</option>
+      <% options.actions.forEach(function (action) { %>
+        <option value="<%= action %>" <%= filters.action === action ? 'selected' : '' %>><%= action %></option>
+      <% }); %>
+    </select>
+
+    <select name="severity" class="form-select" style="width:auto;min-width:130px" aria-label="Severity">
+      <option value="">All levels</option>
+      <% ['info','warning','critical'].forEach(function (level) { %>
+        <option value="<%= level %>" <%= filters.severity === level ? 'selected' : '' %>><%= level %></option>
+      <% }); %>
+    </select>
+
+    <button type="submit" class="btn"><ion-icon name="funnel-outline"></ion-icon><span>Filter</span></button>
+    <% if (Object.values(filters).some(Boolean)) { %>
+      <a href="<%= adminPath %>/activity-logs" class="btn btn-ghost">Clear</a>
+    <% } %>
+  </div>
+</form>
+
+<section class="card" style="padding:0">
+  <% if (result.rows.length) { %>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>When</th><th>Who</th><th>Action</th><th>Description</th><th>Details</th></tr>
+        </thead>
+        <tbody>
+          <% result.rows.forEach(function (row) { %>
+            <tr>
+              <td class="cell-muted" style="white-space:nowrap">
+                <%= h.timeAgo(row.created_at) %>
+                <br><span class="u-small"><%= h.formatDateTime(row.created_at) %></span>
+              </td>
+              <td>
+                <span class="cell-strong"><%= row.user_name || 'system' %></span>
+                <% if (row.user_email) { %><br><span class="cell-muted u-small"><%= row.user_email %></span><% } %>
+              </td>
+              <td>
+                <span class="badge badge-<%= row.severity === 'critical' ? 'danger'
+                  : row.severity === 'warning' ? 'warning' : '' %>">
+                  <%= row.action %>
+                </span>
+              </td>
+              <td><%= row.description || '—' %></td>
+              <td>
+                <% if (row.before_json || row.after_json) { %>
+                  <details class="log-entry">
+                    <summary>Show changes</summary>
+                    <div class="log-diff">
+                      <div>
+                        <p class="u-small u-muted">Before</p>
+                        <pre class="before"><%= row.before_json ? JSON.stringify(JSON.parse(row.before_json), null, 2) : '(none)' %></pre>
+                      </div>
+                      <div>
+                        <p class="u-small u-muted">After</p>
+                        <pre class="after"><%= row.after_json ? JSON.stringify(JSON.parse(row.after_json), null, 2) : '(none)' %></pre>
+                      </div>
+                    </div>
+                  </details>
+                <% } else { %>
+                  <span class="cell-muted u-small">—</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+
+    <%- include('../partials/admin/pagination', { result: result, baseUrl: adminPath + '/activity-logs' }) %>
+
+  <% } else { %>
+    <div class="empty-state">
+      <div class="empty-icon"><ion-icon name="list-outline"></ion-icon></div>
+      <p class="empty-title">No matching activity</p>
+      <p class="empty-text">Every admin action is recorded here with a before/after diff.</p>
+    </div>
+  <% } %>
+</section>
+
+<p class="u-small u-muted u-mt-16" style="line-height:1.7">
+  Passwords, tokens and API keys are excluded from the recorded diffs. IP addresses are
+  stored only as a salted hash.
+</p>
+
+<%- include('../partials/admin/foot') %>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="csrf-token" content="<%= csrfToken() %>">
+  <title>Sign in · Portfolio CMS</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/admin/css/admin.css">
+  <link rel="icon" href="/assets/images/logo.svg" type="image/svg+xml">
+</head>
+<body>
+
+<main class="auth-page">
+  <div class="auth-card">
+
+    <div class="auth-brand">
+      <span class="brand-mark" aria-hidden="true">AS</span>
+      <h1 class="auth-title">Sign in</h1>
+      <p class="auth-subtitle"><%= siteName %></p>
+    </div>
+
+    <% if (notice) { %>
+      <div class="alert alert-<%= notice.type === 'success' ? 'success' : notice.type %>">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        <div class="alert-body"><%= notice.message %></div>
+      </div>
+    <% } %>
+
+    <% if (flash && flash.length) { %>
+      <% flash.forEach(function (item) { %>
+        <div class="alert alert-<%= item.type === 'error' ? 'danger' : item.type %>">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <div class="alert-body"><%= item.message %></div>
+        </div>
+      <% }); %>
+    <% } %>
+
+    <form method="POST" action="<%= adminPath %>/login" data-guard novalidate>
+      <%- csrfField() %>
+      <input type="hidden" name="next" value="<%= nextPath %>">
+
+      <div class="form-row">
+        <label class="form-label" for="identifier">Email or username</label>
+        <input
+          type="text"
+          id="identifier"
+          name="identifier"
+          class="form-input <%= formErrors.identifier ? 'has-error' : '' %>"
+          value="<%= formValues.identifier || '' %>"
+          autocomplete="username"
+          autofocus
+          required>
+        <% if (formErrors.identifier) { %>
+          <p class="form-error"><ion-icon name="alert-circle-outline"></ion-icon><%= formErrors.identifier %></p>
+        <% } %>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label" for="password">Password</label>
+        <div class="input-group">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="form-input <%= formErrors.password ? 'has-error' : '' %>"
+            autocomplete="current-password"
+            required>
+          <button type="button" class="input-action" data-toggle-password="password" aria-label="Show password">
+            <ion-icon name="eye-outline"></ion-icon>
+          </button>
+        </div>
+        <% if (formErrors.password) { %>
+          <p class="form-error"><ion-icon name="alert-circle-outline"></ion-icon><%= formErrors.password %></p>
+        <% } %>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block u-mt-24">
+        <ion-icon name="log-in-outline"></ion-icon>
+        <span>Sign in</span>
+      </button>
+    </form>
+
+    <p class="auth-footer">
+      Protected area. All sign-in attempts are logged.
+    </p>
+  </div>
+</main>
+
+<script src="/static/admin/js/admin.js" defer></script>
+<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+</body>
+</html>

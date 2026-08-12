@@ -1,0 +1,7 @@
+<%- include('./_shell', {
+  status: 503,
+  heading: "Service unavailable",
+  body: typeof message !== 'undefined' && message && 503 < 500 ? message : "The site is temporarily unable to reach its database. Please try again in a moment.",
+  stack: typeof stack !== 'undefined' ? stack : null,
+  isAdminArea: typeof isAdminArea !== 'undefined' ? isAdminArea : false,
+}) %>

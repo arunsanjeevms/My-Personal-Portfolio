@@ -1,0 +1,90 @@
+<%
+/**
+ * Public <head>.
+ *
+ * Reproduces the tags the original index.html emitted, but every value
+ * now comes from the database (site_settings, seo_settings, profile).
+ */
+%><!DOCTYPE html>
+<html lang="<%= meta.language %>">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= meta.title %></title>
+
+  <meta name="description" content="<%= meta.description %>">
+  <meta name="robots" content="<%= meta.robots %>">
+  <% if (meta.author) { %><meta name="author" content="<%= meta.author %>"><% } %>
+  <meta name="theme-color" content="<%= meta.themeColor %>">
+  <link rel="canonical" href="<%= meta.canonical %>">
+  <% if (profile && profile.photo) { %>
+    <link rel="preload" as="image" href="<%= profile.photo.url_path %>" fetchpriority="high">
+  <% } %>
+  <link rel="alternate" href="<%= siteUrl %>/" hreflang="<%= meta.language %>">
+  <link rel="alternate" href="<%= siteUrl %>/" hreflang="x-default">
+
+  <meta property="og:type" content="<%= meta.og.type %>">
+  <meta property="og:locale" content="<%= meta.locale %>">
+  <meta property="og:site_name" content="<%= meta.siteName %>">
+  <meta property="og:title" content="<%= meta.og.title %>">
+  <meta property="og:description" content="<%= meta.og.description %>">
+  <meta property="og:url" content="<%= meta.og.url %>">
+  <% if (meta.og.image) { %>
+    <meta property="og:image" content="<%= meta.og.image %>">
+    <meta property="og:image:alt" content="<%= meta.og.imageAlt %>">
+  <% } %>
+
+  <meta name="twitter:card" content="<%= meta.twitter.card %>">
+  <meta name="twitter:title" content="<%= meta.twitter.title %>">
+  <meta name="twitter:description" content="<%= meta.twitter.description %>">
+  <meta name="twitter:url" content="<%= meta.canonical %>">
+  <% if (meta.twitter.image) { %><meta name="twitter:image" content="<%= meta.twitter.image %>"><% } %>
+  <% if (meta.twitter.handle) { %><meta name="twitter:site" content="<%= meta.twitter.handle %>"><% } %>
+
+  <% if (meta.verification.google) { %>
+    <meta name="google-site-verification" content="<%= meta.verification.google %>">
+  <% } %>
+  <% if (meta.verification.bing) { %>
+    <meta name="msvalidate.01" content="<%= meta.verification.bing %>">
+  <% } %>
+
+  <%# Favicons - each only rendered when one has been uploaded. %>
+  <% if (favicons.ico) { %>
+    <link rel="shortcut icon" href="<%= favicons.ico %>" type="image/x-icon">
+  <% } %>
+  <% if (favicons.png) { %>
+    <link rel="icon" href="<%= favicons.png %>" type="<%= favicons.pngMime %>">
+  <% } %>
+  <% if (favicons.apple) { %>
+    <link rel="apple-touch-icon" href="<%= favicons.apple %>">
+  <% } %>
+
+  <link rel="stylesheet" href="/assets/css/style.css">
+
+  <%# Theme overrides. Only variables changed from the stylesheet default
+      are emitted, so style.css stays the source of truth. %>
+  <% if (themeCss) { %>
+    <style><%- themeCss %></style>
+  <% } %>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <% social.filter(function (s) { return s.include_in_jsonld; }).forEach(function (link) { %>
+    <link rel="me" href="<%= link.url %>">
+  <% }); %>
+
+  <% if (jsonLd) { %>
+    <script type="application/ld+json"><%- jsonLd %></script>
+  <% } %>
+
+  <%# Custom head code. Super-Admin-only setting, rendered raw by design;
+      the danger is documented in the admin UI. %>
+  <% if (customCode && customCode.head) { %><%- customCode.head %><% } %>
+</head>
+
+<body>
+<% if (customCode && customCode.body_start) { %><%- customCode.body_start %><% } %>

@@ -127,3 +127,21 @@
 <p align="center">
   Open to collaborations, internships, and exciting developer opportunities.
 </p>
+
+---
+
+## Running this repository
+
+This repository contains both the portfolio front-end and the custom CMS
+that powers it (Node.js + Express + MySQL).
+
+```bash
+npm install
+npm run setup          # .env, database check, migrations
+npm run create-admin   # create your admin sign-in
+npm run dev            # http://localhost:3000
+```
+
+Full documentation — architecture, database schema, security model,
+environment variables and deployment — lives in
+**[docs/README.md](./docs/README.md)**.

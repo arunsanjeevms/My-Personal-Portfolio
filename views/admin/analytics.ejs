@@ -1,0 +1,227 @@
+<%- include('../partials/admin/head') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Analytics</h1>
+    <p class="page-subtitle">Privacy-conscious visitor data, collected by your own server.</p>
+  </div>
+  <div class="page-header-actions">
+    <div class="range-picker">
+      <% [7, 30, 90, 365].forEach(function (option) { %>
+        <a href="<%= adminPath %>/analytics?days=<%= option %>"
+           class="<%= days === option ? 'is-active' : '' %>"><%= option %>d</a>
+      <% }); %>
+    </div>
+    <a href="<%= adminPath %>/analytics/export" class="btn">
+      <ion-icon name="download-outline"></ion-icon><span>Export</span>
+    </a>
+  </div>
+</div>
+
+<% if (!hasData) { %>
+  <div class="alert alert-info">
+    <ion-icon name="information-circle-outline"></ion-icon>
+    <div class="alert-body">
+      <div class="alert-title">No visits recorded yet</div>
+      Analytics starts collecting as soon as someone visits the public site.
+      Your own visits are excluded while you are signed in here
+      (<a href="<%= adminPath %>/settings?group=analytics" style="color:var(--orange-yellow-crayola)">configurable</a>).
+    </div>
+  </div>
+<% } %>
+
+<div class="grid grid-stats">
+  <div class="stat">
+    <span class="stat-icon"><ion-icon name="people-outline"></ion-icon></span>
+    <div>
+      <p class="stat-value"><%= h.formatNumber(overview.today.visitors || 0) %></p>
+      <p class="stat-label">Visitors today</p>
+      <p class="stat-meta">Yesterday: <%= h.formatNumber(overview.yesterday.visitors || 0) %></p>
+    </div>
+  </div>
+
+  <div class="stat">
+    <span class="stat-icon"><ion-icon name="eye-outline"></ion-icon></span>
+    <div>
+      <p class="stat-value"><%= h.formatNumber(overview.period.pageviews || 0) %></p>
+      <p class="stat-label">Page views (<%= days %>d)</p>
+      <p class="stat-meta"><%= h.formatNumber(overview.totals.pageviews || 0) %> all time</p>
+    </div>
+  </div>
+
+  <div class="stat">
+    <span class="stat-icon"><ion-icon name="time-outline"></ion-icon></span>
+    <div>
+      <p class="stat-value"><%= h.formatDuration(overview.period.avg_duration) %></p>
+      <p class="stat-label">Avg. session</p>
+      <p class="stat-meta"><%= h.formatNumber(overview.period.sessions || 0) %> sessions</p>
+    </div>
+  </div>
+
+  <div class="stat">
+    <span class="stat-icon"><ion-icon name="enter-outline"></ion-icon></span>
+    <div>
+      <p class="stat-value"><%= overview.period.bounce_rate %>%</p>
+      <p class="stat-label">Single-page visits</p>
+      <p class="stat-meta">Left after one page</p>
+    </div>
+  </div>
+</div>
+
+<%# --------------------------------------------------------- chart %>
+<section class="card chart-card u-mt-24">
+  <div class="card-header">
+    <h2 class="card-title">Visitors over time</h2>
+    <div class="card-header-actions">
+      <span class="badge"><%= days %> days</span>
+    </div>
+  </div>
+
+  <%# Hand-drawn SVG rather than a charting library: one line chart does
+      not justify shipping a dependency, and this stays theme-aware. %>
+  <div class="chart-wrap">
+    <%
+      const max = Math.max(1, ...series.map(function (p) { return Math.max(p.visitors, p.pageviews); }));
+      const width = 1000, height = 260, padX = 8, padY = 16;
+      const step = series.length > 1 ? (width - padX * 2) / (series.length - 1) : 0;
+      const pointFor = function (value, index) {
+        const x = padX + index * step;
+        const y = height - padY - ((value / max) * (height - padY * 2));
+        return x.toFixed(1) + ',' + y.toFixed(1);
+      };
+      const visitorPoints = series.map(function (p, i) { return pointFor(p.visitors, i); }).join(' ');
+      const viewPoints = series.map(function (p, i) { return pointFor(p.pageviews, i); }).join(' ');
+    %>
+    <svg viewBox="0 0 <%= width %> <%= height %>" preserveAspectRatio="none"
+         style="width:100%;height:100%" role="img"
+         aria-label="Visitors and page views over the last <%= days %> days">
+      <defs>
+        <linearGradient id="fillVisitors" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="hsl(45,100%,72%)" stop-opacity="0.28"/>
+          <stop offset="100%" stop-color="hsl(45,100%,72%)" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+
+      <% [0.25, 0.5, 0.75].forEach(function (fraction) { %>
+        <line x1="0" y1="<%= (height * fraction).toFixed(1) %>" x2="<%= width %>"
+              y2="<%= (height * fraction).toFixed(1) %>"
+              stroke="hsl(0,0%,22%)" stroke-width="1" stroke-dasharray="4 6"/>
+      <% }); %>
+
+      <% if (series.length > 1) { %>
+        <polygon points="<%= padX %>,<%= height - padY %> <%= visitorPoints %> <%= (padX + (series.length - 1) * step).toFixed(1) %>,<%= height - padY %>"
+                 fill="url(#fillVisitors)"/>
+        <polyline points="<%= viewPoints %>" fill="none" stroke="hsl(205,75%,58%)"
+                  stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="0.75"/>
+        <polyline points="<%= visitorPoints %>" fill="none" stroke="hsl(45,100%,72%)"
+                  stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      <% } %>
+    </svg>
+  </div>
+
+  <div class="u-flex u-gap-16 u-mt-16 u-small">
+    <span><span class="status-dot" style="background:hsl(45,100%,72%)"></span> Visitors</span>
+    <span><span class="status-dot" style="background:hsl(205,75%,58%)"></span> Page views</span>
+    <span class="u-muted" style="margin-left:auto">
+      <%= series[0] ? series[0].date : '' %> → <%= series.length ? series[series.length - 1].date : '' %>
+    </span>
+  </div>
+</section>
+
+<%# ------------------------------------------------------ live panel %>
+<section class="card u-mt-24">
+  <div class="card-header">
+    <h2 class="card-title">Currently online</h2>
+    <div class="card-header-actions">
+      <span class="badge badge-success" data-live-count>
+        <span class="live-dot"></span> <%= live.online %> now
+      </span>
+    </div>
+  </div>
+
+  <div data-live-list>
+    <% if (live.visitors.length) { %>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Page</th><th>Device</th><th>Browser</th><th>Views</th><th>Last seen</th></tr></thead>
+          <tbody>
+            <% live.visitors.forEach(function (visitor) { %>
+              <tr>
+                <td class="cell-strong u-mono"><%= visitor.current_path || '/' %></td>
+                <td style="text-transform:capitalize"><%= visitor.device_type %></td>
+                <td class="cell-muted"><%= visitor.browser || '—' %></td>
+                <td><%= visitor.pageview_count %></td>
+                <td class="cell-muted"><%= h.timeAgo(visitor.last_activity_at) %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <p class="u-muted u-small" style="padding:14px 0">
+        Nobody is browsing the site right now
+        (activity within the last <%= live.windowMinutes %> minutes counts as online).
+      </p>
+    <% } %>
+  </div>
+</section>
+
+<%# ------------------------------------------------------ breakdowns %>
+<div class="grid grid-2 u-mt-24">
+  <%
+    const panels = [
+      ['Top pages', breakdowns.pages, 'document-outline'],
+      ['Traffic sources', breakdowns.sources, 'git-network-outline'],
+      ['Referrers', breakdowns.referrers, 'link-outline'],
+      ['Devices', breakdowns.devices, 'phone-portrait-outline'],
+      ['Browsers', breakdowns.browsers, 'globe-outline'],
+      ['Operating systems', breakdowns.os, 'desktop-outline'],
+    ];
+  %>
+  <% panels.forEach(function (panel) {
+       const label = panel[0], rows = panel[1], icon = panel[2];
+       const total = rows.reduce(function (sum, row) { return sum + Number(row.total); }, 0) || 1; %>
+    <section class="card">
+      <div class="card-header">
+        <h2 class="card-title"><%= label %></h2>
+      </div>
+
+      <% if (rows.length) { %>
+        <div class="bar-list">
+          <% rows.forEach(function (row) { %>
+            <div class="bar-row">
+              <span class="bar-label" title="<%= row.label %>"><%= row.label || 'Unknown' %></span>
+              <span class="bar-value"><%= h.formatNumber(row.total) %></span>
+              <span class="bar-track">
+                <span class="bar-fill" style="width: <%= ((Number(row.total) / total) * 100).toFixed(1) %>%"></span>
+              </span>
+            </div>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <div class="empty-state" style="padding:28px 12px">
+          <div class="empty-icon" style="width:46px;height:46px;font-size:22px">
+            <ion-icon name="<%= icon %>"></ion-icon>
+          </div>
+          <p class="empty-text u-mb-0">No data for this period yet.</p>
+        </div>
+      <% } %>
+    </section>
+  <% }); %>
+</div>
+
+<section class="card u-mt-24">
+  <div class="card-header"><h2 class="card-title">How this works</h2></div>
+  <p class="u-small u-muted" style="line-height:1.8">
+    Visits are counted by your own server — there is no Google Analytics, no third-party
+    script and no advertising identifier. <strong>Raw IP addresses are never stored.</strong>
+    A visitor is identified by <code>sha256(ip + user-agent + a salt that rotates daily)</code>,
+    which makes them countable within one day but impossible to link across days or trace
+    back to a person. Bots are detected and excluded. Raw rows are kept for
+    <%= settings.analytics_retention_days || 365 %> days
+    (<a href="<%= adminPath %>/settings?group=analytics" style="color:var(--orange-yellow-crayola)">configurable</a>),
+    then deleted once they have been rolled up into daily totals.
+  </p>
+</section>
+
+<%- include('../partials/admin/foot') %>

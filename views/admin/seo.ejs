@@ -1,0 +1,151 @@
+<%- include('../partials/admin/head') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">SEO</h1>
+    <p class="page-subtitle">Meta tags, social cards and sitemap settings for each page.</p>
+  </div>
+  <div class="page-header-actions">
+    <a href="<%= siteUrl %>/sitemap.xml" target="_blank" rel="noopener" class="btn">
+      <ion-icon name="map-outline"></ion-icon><span>sitemap.xml</span>
+    </a>
+    <a href="<%= siteUrl %>/robots.txt" target="_blank" rel="noopener" class="btn">
+      <ion-icon name="document-outline"></ion-icon><span>robots.txt</span>
+    </a>
+  </div>
+</div>
+
+<div class="alert alert-info">
+  <ion-icon name="information-circle-outline"></ion-icon>
+  <div class="alert-body">
+    <code>sitemap.xml</code> and <code>robots.txt</code> are generated from these settings on
+    request. Structured data (JSON-LD) is built automatically from your profile, social links
+    and education — there is nothing to maintain by hand.
+    <% if (settings.site_status !== 'published') { %>
+      <br><strong style="color:var(--admin-warning)">Your site status is
+      "<%= settings.site_status %>", so robots.txt currently disallows all crawling.</strong>
+    <% } %>
+  </div>
+</div>
+
+<% rows.forEach(function (row, index) { %>
+  <section class="card <%= index ? 'u-mt-24' : '' %>">
+    <div class="card-header">
+      <h2 class="card-title"><%= row.page_label || row.page_key %></h2>
+      <div class="card-header-actions">
+        <span class="badge <%= row.in_sitemap ? 'badge-success' : '' %>">
+          <%= row.in_sitemap ? 'in sitemap' : 'excluded' %>
+        </span>
+        <span class="badge <%= String(row.robots).includes('noindex') ? 'badge-warning' : '' %>">
+          <%= String(row.robots).includes('noindex') ? 'noindex' : 'indexed' %>
+        </span>
+      </div>
+    </div>
+
+    <form method="POST" action="<%= adminPath %>/seo/<%= row.id %>" data-guard>
+      <%- csrfField() %>
+
+      <div class="form-grid">
+        <div class="form-row" style="grid-column:1/-1">
+          <label class="form-label" for="meta_title_<%= row.id %>">Meta title</label>
+          <input type="text" id="meta_title_<%= row.id %>" name="meta_title"
+                 value="<%= row.meta_title || '' %>" class="form-input" maxlength="200"
+                 data-counter="60">
+          <p class="form-hint">
+            Around 60 characters shows fully in search results.
+            <% if (row.page_key !== 'home') { %>
+              This runs through your title template; the home page uses its title verbatim.
+            <% } %>
+          </p>
+        </div>
+
+        <div class="form-row" style="grid-column:1/-1">
+          <label class="form-label" for="meta_description_<%= row.id %>">Meta description</label>
+          <textarea id="meta_description_<%= row.id %>" name="meta_description" rows="2"
+                    class="form-textarea" maxlength="320" data-counter="155"><%= row.meta_description || '' %></textarea>
+          <p class="form-hint">Around 155 characters is the usual limit before truncation.</p>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label" for="meta_keywords_<%= row.id %>">Keywords</label>
+          <input type="text" id="meta_keywords_<%= row.id %>" name="meta_keywords"
+                 value="<%= row.meta_keywords || '' %>" class="form-input">
+          <p class="form-hint">Comma separated. Most search engines ignore these now.</p>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label" for="canonical_<%= row.id %>">Canonical URL</label>
+          <input type="text" id="canonical_<%= row.id %>" name="canonical_url"
+                 value="<%= row.canonical_url || '' %>" class="form-input"
+                 placeholder="Defaults to the page URL">
+        </div>
+
+        <div class="form-row">
+          <label class="form-label" for="robots_<%= row.id %>">Robots directive</label>
+          <input type="text" id="robots_<%= row.id %>" name="robots"
+                 value="<%= row.robots %>" class="form-input u-mono">
+        </div>
+
+        <div class="form-row">
+          <label class="form-label" for="twitter_card_<%= row.id %>">X / Twitter card</label>
+          <select id="twitter_card_<%= row.id %>" name="twitter_card" class="form-select">
+            <option value="summary_large_image" <%= row.twitter_card === 'summary_large_image' ? 'selected' : '' %>>Large image</option>
+            <option value="summary" <%= row.twitter_card === 'summary' ? 'selected' : '' %>>Summary</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">Social share image</label>
+          <div class="media-field" data-media-field>
+            <input type="hidden" name="og_media_id" value="<%= row.og_media_id || '' %>" data-media-input>
+            <div class="media-preview" data-media-preview>
+              <% if (row.og_media_id && media[row.og_media_id]) { %>
+                <img src="<%= media[row.og_media_id].url_path %>" alt="">
+              <% } else { %>
+                <span class="media-placeholder"><ion-icon name="image-outline"></ion-icon></span>
+              <% } %>
+            </div>
+            <div class="u-flex u-gap-8">
+              <button type="button" class="btn btn-sm" data-media-pick data-accept="image">
+                <ion-icon name="images-outline"></ion-icon><span>Choose</span>
+              </button>
+              <button type="button" class="btn btn-sm btn-ghost" data-media-clear <%= row.og_media_id ? '' : 'hidden' %>>
+                <ion-icon name="close-outline"></ion-icon><span>Remove</span>
+              </button>
+            </div>
+          </div>
+          <p class="form-hint">1200×630 works best. Falls back to your profile photo.</p>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label" for="changefreq_<%= row.id %>">Sitemap change frequency</label>
+          <select id="changefreq_<%= row.id %>" name="sitemap_changefreq" class="form-select">
+            <% ['always','hourly','daily','weekly','monthly','yearly','never'].forEach(function (option) { %>
+              <option value="<%= option %>" <%= row.sitemap_changefreq === option ? 'selected' : '' %>><%= option %></option>
+            <% }); %>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label" for="priority_<%= row.id %>">Sitemap priority</label>
+          <input type="number" id="priority_<%= row.id %>" name="sitemap_priority" step="0.1" min="0" max="1"
+                 value="<%= row.sitemap_priority %>" class="form-input">
+        </div>
+
+        <div class="form-row">
+          <div class="form-check">
+            <input type="checkbox" id="in_sitemap_<%= row.id %>" name="in_sitemap" <%= row.in_sitemap ? 'checked' : '' %>>
+            <label for="in_sitemap_<%= row.id %>">Include in sitemap.xml</label>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary u-mt-16">
+        <ion-icon name="save-outline"></ion-icon><span>Save <%= (row.page_label || row.page_key).toLowerCase() %> SEO</span>
+      </button>
+    </form>
+  </section>
+<% }); %>
+
+<%- include('../partials/admin/media-picker') %>
+<%- include('../partials/admin/foot') %>

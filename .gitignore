@@ -1,0 +1,25 @@
+# ---- secrets ----
+.env
+.env.*
+!.env.example
+
+# ---- dependencies ----
+node_modules/
+
+# ---- runtime artefacts ----
+logs/
+*.log
+npm-debug.log*
+
+# ---- user uploads & generated storage ----
+storage/uploads/
+storage/backups/
+storage/cache/
+public/uploads/
+
+# ---- os / editor ----
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp

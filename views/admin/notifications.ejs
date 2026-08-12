@@ -1,0 +1,82 @@
+<%- include('../partials/admin/head') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Notifications</h1>
+    <p class="page-subtitle"><%= h.formatNumber(result.total) %> notification<%= result.total === 1 ? '' : 's' %></p>
+  </div>
+  <div class="page-header-actions">
+    <a href="<%= adminPath %>/notifications<%= unreadOnly ? '' : '?filter=unread' %>" class="btn">
+      <ion-icon name="filter-outline"></ion-icon>
+      <span><%= unreadOnly ? 'Show all' : 'Unread only' %></span>
+    </a>
+    <form method="POST" action="<%= adminPath %>/notifications/read-all" style="display:inline">
+      <%- csrfField() %>
+      <button type="submit" class="btn btn-primary">
+        <ion-icon name="checkmark-done-outline"></ion-icon><span>Mark all read</span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<section class="card" style="padding:0">
+  <% if (result.rows.length) { %>
+    <div style="padding:4px 20px">
+      <% result.rows.forEach(function (item) { %>
+        <div class="activity-item is-<%= item.severity %>" style="<%= item.read_at ? 'opacity:.6' : '' %>">
+          <span class="activity-dot">
+            <ion-icon name="<%= item.type === 'contact_message' ? 'mail-outline'
+              : item.type.includes('domain') ? 'globe-outline'
+              : item.type.includes('ssl') ? 'lock-closed-outline'
+              : item.type.includes('backup') ? 'save-outline'
+              : item.type.includes('login') ? 'shield-outline'
+              : 'notifications-outline' %>"></ion-icon>
+          </span>
+
+          <div style="flex:1;min-width:0">
+            <p class="activity-text">
+              <strong style="color:var(--white-2)"><%= item.title %></strong>
+              <% if (!item.read_at) { %>
+                <span class="badge badge-accent" style="margin-left:6px">new</span>
+              <% } %>
+            </p>
+            <% if (item.body) { %>
+              <p class="activity-meta"><%= h.truncate(item.body, 120) %></p>
+            <% } %>
+            <p class="activity-meta"><%= h.timeAgo(item.created_at) %></p>
+          </div>
+
+          <div class="u-flex u-gap-8">
+            <% if (item.link) { %>
+              <a href="<%= adminPath %><%= item.link %>" class="btn btn-sm">
+                <ion-icon name="open-outline"></ion-icon>
+              </a>
+            <% } %>
+            <% if (!item.read_at) { %>
+              <form method="POST" action="<%= adminPath %>/notifications/<%= item.id %>/read" style="display:inline">
+                <%- csrfField() %>
+                <button type="submit" class="btn btn-sm btn-ghost" title="Mark as read">
+                  <ion-icon name="checkmark-outline"></ion-icon>
+                </button>
+              </form>
+            <% } %>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+
+    <%- include('../partials/admin/pagination', { result: result, baseUrl: adminPath + '/notifications' }) %>
+
+  <% } else { %>
+    <div class="empty-state">
+      <div class="empty-icon"><ion-icon name="notifications-off-outline"></ion-icon></div>
+      <p class="empty-title"><%= unreadOnly ? 'Nothing unread' : 'No notifications' %></p>
+      <p class="empty-text">
+        New contact messages, domain and SSL expiry warnings, failed sign-in bursts and
+        backup failures all appear here.
+      </p>
+    </div>
+  <% } %>
+</section>
+
+<%- include('../partials/admin/foot') %>

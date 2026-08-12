@@ -1,0 +1,29 @@
+    </main>
+  </div>
+</div>
+
+<%# Shared confirmation dialog. Any element with data-confirm="..." opens it. %>
+<div class="modal-backdrop" data-modal-backdrop role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal">
+    <div class="modal-icon" aria-hidden="true">
+      <ion-icon name="warning-outline"></ion-icon>
+    </div>
+    <h2 class="modal-title" id="modal-title" data-modal-title>Are you sure?</h2>
+    <p class="modal-text" data-modal-text></p>
+    <div class="modal-actions">
+      <button type="button" class="btn" data-modal-cancel>Cancel</button>
+      <button type="button" class="btn btn-danger" data-modal-confirm>Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" data-toast-stack role="status" aria-live="polite"></div>
+
+<script src="/static/admin/js/admin.js" defer></script>
+<script src="/static/admin/js/media.js" defer></script>
+<script src="/static/admin/js/settings.js" defer></script>
+<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+</body>
+</html>

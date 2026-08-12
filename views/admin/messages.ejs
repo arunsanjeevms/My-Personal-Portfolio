@@ -1,0 +1,112 @@
+<%- include('../partials/admin/head') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Messages</h1>
+    <p class="page-subtitle">
+      <%= h.formatNumber(counts.all) %> total
+      <% if (counts.unread) { %> · <strong class="u-accent"><%= counts.unread %> unread</strong><% } %>
+    </p>
+  </div>
+  <div class="page-header-actions">
+    <a href="<%= adminPath %>/messages/export" class="btn">
+      <ion-icon name="download-outline"></ion-icon><span>Export CSV</span>
+    </a>
+  </div>
+</div>
+
+<%# ------------------------------------------------------ status chips %>
+<div class="u-flex u-gap-8 u-mb-0" style="flex-wrap:wrap;margin-bottom:18px">
+  <a href="<%= adminPath %>/messages" class="btn btn-sm <%= !activeStatus ? 'btn-primary' : '' %>">
+    All <span class="nav-badge"><%= counts.all %></span>
+  </a>
+  <% statuses.forEach(function (status) { %>
+    <a href="<%= adminPath %>/messages?status=<%= status %>"
+       class="btn btn-sm <%= activeStatus === status ? 'btn-primary' : '' %>">
+      <span style="text-transform:capitalize"><%= status %></span>
+      <span class="nav-badge"><%= counts[status] %></span>
+    </a>
+  <% }); %>
+</div>
+
+<form method="GET" action="<%= adminPath %>/messages" class="card" style="padding:14px 16px;margin-bottom:18px">
+  <% if (activeStatus) { %><input type="hidden" name="status" value="<%= activeStatus %>"><% } %>
+  <div class="u-flex u-gap-12" style="flex-wrap:wrap">
+    <div class="topbar-search" style="width:auto;flex:1;min-width:200px;display:flex">
+      <ion-icon name="search-outline"></ion-icon>
+      <label class="sr-only" for="q">Search messages</label>
+      <input type="search" id="q" name="q" value="<%= searchTerm %>" placeholder="Search name, email or message…">
+    </div>
+    <button type="submit" class="btn"><ion-icon name="search-outline"></ion-icon><span>Search</span></button>
+    <% if (searchTerm) { %><a href="<%= adminPath %>/messages" class="btn btn-ghost">Clear</a><% } %>
+  </div>
+</form>
+
+<section class="card" style="padding:0">
+  <% if (result.rows.length) { %>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:44px"></th>
+            <th>From</th><th>Subject</th><th>Status</th><th>Received</th>
+            <th style="text-align:right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% result.rows.forEach(function (row) { %>
+            <tr class="message-row <%= row.status === 'unread' ? 'is-unread' : '' %>">
+              <td>
+                <form method="POST" action="<%= adminPath %>/messages/<%= row.id %>/star" style="display:inline">
+                  <%- csrfField() %>
+                  <button type="submit" class="btn btn-sm btn-ghost" aria-label="Star">
+                    <ion-icon name="<%= row.is_starred ? 'star' : 'star-outline' %>"
+                              style="<%= row.is_starred ? 'color:var(--orange-yellow-crayola)' : '' %>"></ion-icon>
+                  </button>
+                </form>
+              </td>
+              <td>
+                <a href="<%= adminPath %>/messages/<%= row.id %>" class="cell-strong"><%= row.name %></a>
+                <br><span class="cell-muted u-small"><%= row.email %></span>
+              </td>
+              <td>
+                <a href="<%= adminPath %>/messages/<%= row.id %>">
+                  <%= row.subject || '(no subject)' %>
+                </a>
+                <br><span class="cell-muted u-small"><%= h.truncate(row.preview, 70) %></span>
+              </td>
+              <td>
+                <span class="badge badge-<%= row.status === 'unread' ? 'accent'
+                  : row.status === 'replied' ? 'success'
+                  : row.status === 'spam' ? 'danger' : '' %>"><%= row.status %></span>
+                <% if (row.spam_score >= 40 && row.status !== 'spam') { %>
+                  <br><span class="badge badge-warning u-small" style="margin-top:4px">spam score <%= row.spam_score %></span>
+                <% } %>
+              </td>
+              <td class="cell-muted"><%= h.timeAgo(row.created_at) %></td>
+              <td class="cell-actions">
+                <a href="<%= adminPath %>/messages/<%= row.id %>" class="btn btn-sm">
+                  <ion-icon name="open-outline"></ion-icon>
+                </a>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+
+    <%- include('../partials/admin/pagination', { result: result, baseUrl: adminPath + '/messages' }) %>
+
+  <% } else { %>
+    <div class="empty-state">
+      <div class="empty-icon"><ion-icon name="mail-outline"></ion-icon></div>
+      <p class="empty-title"><%= searchTerm || activeStatus ? 'Nothing here' : 'No messages yet' %></p>
+      <p class="empty-text">
+        Messages sent through the contact form on your site arrive here.
+        They are stored in your own database — no third-party form service involved.
+      </p>
+    </div>
+  <% } %>
+</section>
+
+<%- include('../partials/admin/foot') %>

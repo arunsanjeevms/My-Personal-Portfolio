@@ -1,0 +1,261 @@
+<%- include('../partials/admin/head') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Users &amp; roles</h1>
+    <p class="page-subtitle"><%= users.length %> account<%= users.length === 1 ? '' : 's' %></p>
+  </div>
+</div>
+
+<section class="card" style="padding:0">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr><th>Account</th><th>Role</th><th>2FA</th><th>Status</th><th>Last sign-in</th>
+        <th style="text-align:right">Actions</th></tr>
+      </thead>
+      <tbody>
+        <% users.forEach(function (user) {
+             const isSelf = user.id === currentUser.id;
+             const outranksMe = user.role_level > currentUser.roleLevel; %>
+          <tr>
+            <td>
+              <span class="cell-strong"><%= user.name %></span>
+              <% if (isSelf) { %><span class="badge badge-accent" style="margin-left:6px">you</span><% } %>
+              <br><span class="cell-muted u-small"><%= user.email %></span>
+              <% if (user.username) { %>
+                <span class="cell-muted u-small"> · @<%= user.username %></span>
+              <% } %>
+              <% if (user.must_change_password) { %>
+                <br><span class="badge badge-warning u-small" style="margin-top:4px">must change password</span>
+              <% } %>
+            </td>
+
+            <td>
+              <% if (isSelf || outranksMe) { %>
+                <span class="badge"><%= user.role_name %></span>
+              <% } else { %>
+                <form method="POST" action="<%= adminPath %>/users/<%= user.id %>/role" style="display:inline">
+                  <%- csrfField() %>
+                  <select name="role_id" class="form-select" style="width:auto;min-width:130px"
+                          onchange="this.form.submit()" aria-label="Role for <%= user.name %>">
+                    <% roles.forEach(function (role) { %>
+                      <% if (role.level <= currentUser.roleLevel) { %>
+                        <option value="<%= role.id %>" <%= role.id === user.role_id ? 'selected' : '' %>>
+                          <%= role.name %>
+                        </option>
+                      <% } %>
+                    <% }); %>
+                  </select>
+                </form>
+              <% } %>
+            </td>
+
+            <td>
+              <span class="badge badge-<%= user.twoFactor.enabled ? 'success' : '' %>">
+                <%= user.twoFactor.enabled ? 'on' : 'off' %>
+              </span>
+            </td>
+
+            <td>
+              <span class="badge badge-<%= user.status === 'active' ? 'success' : 'danger' %>">
+                <%= user.status %>
+              </span>
+            </td>
+
+            <td class="cell-muted u-small">
+              <%= user.last_login_at ? h.timeAgo(user.last_login_at) : 'never' %>
+            </td>
+
+            <td class="cell-actions">
+              <div class="u-flex u-gap-8" style="justify-content:flex-end">
+                <% if (!isSelf && !outranksMe) { %>
+                  <button type="button" class="btn btn-sm" data-reset-user="<%= user.id %>"
+                          data-name="<%= user.name %>" title="Reset password">
+                    <ion-icon name="key-outline"></ion-icon>
+                  </button>
+
+                  <form method="POST" action="<%= adminPath %>/users/<%= user.id %>/status" style="display:inline">
+                    <%- csrfField() %>
+                    <button type="submit" class="btn btn-sm"
+                            data-confirm="<%= user.status === 'active'
+                              ? user.name + ' will not be able to sign in until reactivated.'
+                              : user.name + ' will be able to sign in again.' %>"
+                            data-confirm-title="<%= user.status === 'active' ? 'Suspend' : 'Reactivate' %> this account?"
+                            data-confirm-action="<%= user.status === 'active' ? 'Suspend' : 'Reactivate' %>"
+                            data-confirm-danger="<%= user.status === 'active' ? 'true' : 'false' %>"
+                            title="<%= user.status === 'active' ? 'Suspend' : 'Reactivate' %>">
+                      <ion-icon name="<%= user.status === 'active' ? 'pause-outline' : 'play-outline' %>"></ion-icon>
+                    </button>
+                  </form>
+
+                  <form method="POST" action="<%= adminPath %>/users/<%= user.id %>/delete" style="display:inline">
+                    <%- csrfField() %>
+                    <button type="submit" class="btn btn-sm btn-danger"
+                            data-confirm="<%= user.name %>'s account will be removed. Their entries in the activity log are kept."
+                            data-confirm-title="Delete this account?" data-confirm-action="Delete"
+                            title="Delete">
+                      <ion-icon name="trash-outline"></ion-icon>
+                    </button>
+                  </form>
+                <% } else { %>
+                  <span class="cell-muted u-small"><%= isSelf ? 'your account' : 'outranks you' %></span>
+                <% } %>
+              </div>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<%# ------------------------------------------------------ create user %>
+<section class="card u-mt-24">
+  <div class="card-header"><h2 class="card-title">Add an account</h2></div>
+
+  <form method="POST" action="<%= adminPath %>/users" data-guard novalidate>
+    <%- csrfField() %>
+
+    <div class="form-grid">
+      <div class="form-row">
+        <label class="form-label" for="name">Name <span class="req">*</span></label>
+        <input type="text" id="name" name="name" value="<%= formValues.name || '' %>"
+               class="form-input <%= formErrors.name ? 'has-error' : '' %>" required>
+        <% if (formErrors.name) { %><p class="form-error"><ion-icon name="alert-circle-outline"></ion-icon><%= formErrors.name %></p><% } %>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label" for="email">Email <span class="req">*</span></label>
+        <input type="email" id="email" name="email" value="<%= formValues.email || '' %>"
+               class="form-input <%= formErrors.email ? 'has-error' : '' %>" required>
+        <% if (formErrors.email) { %><p class="form-error"><ion-icon name="alert-circle-outline"></ion-icon><%= formErrors.email %></p><% } %>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label" for="username">Username</label>
+        <input type="text" id="username" name="username" value="<%= formValues.username || '' %>"
+               class="form-input <%= formErrors.username ? 'has-error' : '' %>">
+        <p class="form-hint">Optional. They can sign in with either this or their email.</p>
+        <% if (formErrors.username) { %><p class="form-error"><ion-icon name="alert-circle-outline"></ion-icon><%= formErrors.username %></p><% } %>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label" for="role_id">Role <span class="req">*</span></label>
+        <select id="role_id" name="role_id" class="form-select <%= formErrors.role_id ? 'has-error' : '' %>" required>
+          <% roles.forEach(function (role) { %>
+            <% if (role.level <= currentUser.roleLevel) { %>
+              <option value="<%= role.id %>" <%= String(formValues.role_id) === String(role.id) ? 'selected' : '' %>>
+                <%= role.name %> — <%= role.description %>
+              </option>
+            <% } %>
+          <% }); %>
+        </select>
+        <% if (formErrors.role_id) { %><p class="form-error"><ion-icon name="alert-circle-outline"></ion-icon><%= formErrors.role_id %></p><% } %>
+      </div>
+
+      <div class="form-row" style="grid-column:1/-1">
+        <label class="form-label" for="password">Temporary password <span class="req">*</span></label>
+        <div class="input-group">
+          <input type="password" id="password" name="password"
+                 class="form-input <%= formErrors.password ? 'has-error' : '' %>"
+                 autocomplete="new-password" required>
+          <button type="button" class="input-action" data-toggle-password="password" aria-label="Show password">
+            <ion-icon name="eye-outline"></ion-icon>
+          </button>
+        </div>
+        <p class="form-hint">
+          At least 12 characters. Give it to them over a channel you trust — they will be
+          required to choose their own before they can use the panel.
+        </p>
+        <% if (formErrors.password) { %><p class="form-error"><ion-icon name="alert-circle-outline"></ion-icon><%= formErrors.password %></p><% } %>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+      <ion-icon name="person-add-outline"></ion-icon><span>Create account</span>
+    </button>
+  </form>
+</section>
+
+<%# ------------------------------------------------------------ roles %>
+<section class="card u-mt-24">
+  <div class="card-header"><h2 class="card-title">Roles</h2></div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Role</th><th>Level</th><th>Permissions</th><th>Accounts</th><th>Scope</th></tr></thead>
+      <tbody>
+        <% roles.forEach(function (role) { %>
+          <tr>
+            <td class="cell-strong"><%= role.name %></td>
+            <td class="cell-muted"><%= role.level %></td>
+            <td><span class="badge"><%= role.permission_count %></span></td>
+            <td class="cell-muted"><%= role.user_count %></td>
+            <td class="cell-muted u-small"><%= role.description %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="form-hint u-mt-16">
+    Roles are fixed by design — the permission set behind each one is enforced on every
+    route, not just hidden in the menu. Super Admin is always allowed everything so the
+    owner can never be locked out of their own site.
+  </p>
+</section>
+
+<%# --------------------------------------------------- reset password %>
+<div class="modal-backdrop" data-reset-modal role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-icon"><ion-icon name="key-outline"></ion-icon></div>
+    <h2 class="modal-title">Reset password</h2>
+    <p class="modal-text">
+      Set a temporary password for <strong data-reset-name></strong>.
+      They will have to choose their own the next time they sign in.
+    </p>
+
+    <form method="POST" action="" data-reset-form>
+      <%- csrfField() %>
+      <div class="form-row u-mt-16">
+        <label class="form-label" for="reset-password">New temporary password</label>
+        <input type="text" id="reset-password" name="password" class="form-input u-mono"
+               autocomplete="off" minlength="12" required>
+        <p class="form-hint">At least 12 characters.</p>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn" data-reset-cancel>Cancel</button>
+        <button type="submit" class="btn btn-danger">Reset password</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var modal = document.querySelector('[data-reset-modal]');
+    if (!modal) return;
+    var form = modal.querySelector('[data-reset-form]');
+    var adminPath = document.body.dataset.adminPath || '/admin';
+
+    document.querySelectorAll('[data-reset-user]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        form.action = adminPath + '/users/' + button.dataset.resetUser + '/reset-password';
+        modal.querySelector('[data-reset-name]').textContent = button.dataset.name;
+        form.querySelector('#reset-password').value = '';
+        modal.classList.add('is-open');
+        form.querySelector('#reset-password').focus();
+      });
+    });
+
+    modal.querySelector('[data-reset-cancel]').addEventListener('click', function () {
+      modal.classList.remove('is-open');
+    });
+    modal.addEventListener('click', function (event) {
+      if (event.target === modal) modal.classList.remove('is-open');
+    });
+  }());
+</script>
+
+<%- include('../partials/admin/foot') %>

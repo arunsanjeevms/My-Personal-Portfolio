@@ -1,0 +1,198 @@
+<%- include('../partials/admin/head') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Backups</h1>
+    <p class="page-subtitle">Database snapshots you can download and restore.</p>
+  </div>
+  <div class="page-header-actions">
+    <form method="POST" action="<%= adminPath %>/backups" data-guard>
+      <%- csrfField() %>
+      <button type="submit" class="btn btn-primary">
+        <ion-icon name="save-outline"></ion-icon><span>Create backup now</span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<div class="alert alert-warning">
+  <ion-icon name="warning-outline"></ion-icon>
+  <div class="alert-body">
+    <div class="alert-title">Keep a copy somewhere else</div>
+    Backups are written to <code><%= backupDir %></code> on this server. If the server is lost,
+    they are lost with it. Download the important ones, or copy them off-server on a schedule.
+  </div>
+</div>
+
+<section class="card" style="padding:0">
+  <% if (backups.length) { %>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Backup</th><th>Type</th><th>Size</th><th>Status</th><th>Created</th>
+          <th style="text-align:right">Actions</th></tr>
+        </thead>
+        <tbody>
+          <% backups.forEach(function (backup) { %>
+            <tr>
+              <td>
+                <span class="cell-strong u-mono u-small"><%= backup.filename %></span>
+                <% if (backup.tables_count) { %>
+                  <br><span class="cell-muted u-small"><%= backup.tables_count %> tables</span>
+                <% } %>
+                <% if (backup.status === 'completed' && !backup.fileExists) { %>
+                  <br><span class="badge badge-danger u-small">file missing from disk</span>
+                <% } %>
+              </td>
+              <td>
+                <span class="badge <%= backup.backup_type === 'pre-restore' ? 'badge-warning' : '' %>">
+                  <%= backup.backup_type %>
+                </span>
+              </td>
+              <td class="cell-muted"><%= backup.size_bytes ? h.formatBytes(backup.size_bytes) : '—' %></td>
+              <td>
+                <span class="badge badge-<%= backup.status === 'completed' ? 'success'
+                  : backup.status === 'failed' ? 'danger' : 'warning' %>"><%= backup.status %></span>
+                <% if (backup.error_message) { %>
+                  <br><span class="cell-muted u-small"><%= h.truncate(backup.error_message, 50) %></span>
+                <% } %>
+              </td>
+              <td class="cell-muted">
+                <%= h.timeAgo(backup.created_at) %>
+                <% if (backup.created_by_name) { %>
+                  <br><span class="u-small">by <%= backup.created_by_name %></span>
+                <% } %>
+              </td>
+              <td class="cell-actions">
+                <div class="u-flex u-gap-8" style="justify-content:flex-end">
+                  <% if (backup.status === 'completed' && backup.fileExists) { %>
+                    <a href="<%= adminPath %>/backups/<%= backup.id %>/download" class="btn btn-sm" title="Download">
+                      <ion-icon name="download-outline"></ion-icon>
+                    </a>
+                    <button type="button" class="btn btn-sm btn-danger" data-restore="<%= backup.id %>"
+                            data-filename="<%= backup.filename %>" title="Restore">
+                      <ion-icon name="refresh-outline"></ion-icon>
+                    </button>
+                  <% } %>
+                  <form method="POST" action="<%= adminPath %>/backups/<%= backup.id %>/delete" style="display:inline">
+                    <%- csrfField() %>
+                    <button type="submit" class="btn btn-sm btn-ghost" style="color:var(--admin-danger)"
+                            data-confirm="The backup file will be deleted from disk permanently."
+                            data-confirm-title="Delete this backup?" data-confirm-action="Delete">
+                      <ion-icon name="trash-outline"></ion-icon>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %>
+    <div class="empty-state">
+      <div class="empty-icon"><ion-icon name="save-outline"></ion-icon></div>
+      <p class="empty-title">No backups yet</p>
+      <p class="empty-text">
+        Create one before making big changes. Backups need the <code>mysqldump</code> binary —
+        the path is set in <code>.env</code>.
+      </p>
+    </div>
+  <% } %>
+</section>
+
+<%# ------------------------------------------------------ restore modal %>
+<div class="modal-backdrop" data-restore-modal role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-icon"><ion-icon name="warning-outline"></ion-icon></div>
+    <h2 class="modal-title">Restore this backup?</h2>
+    <p class="modal-text">
+      This <strong>replaces your entire database</strong> with the contents of
+      <strong data-restore-filename></strong>. Everything created since that backup —
+      content, messages, analytics — will be gone.
+      <br><br>
+      A safety backup of the current state is taken first, so this can be undone.
+    </p>
+
+    <form method="POST" action="" data-restore-form>
+      <%- csrfField() %>
+      <div class="form-row u-mt-16">
+        <label class="form-label" for="restore-confirm">Type <strong>RESTORE</strong> to confirm</label>
+        <input type="text" id="restore-confirm" name="confirm" class="form-input u-mono"
+               autocomplete="off" placeholder="RESTORE" required>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn" data-restore-cancel>Cancel</button>
+        <button type="submit" class="btn btn-danger">Restore database</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%# ------------------------------------------------------ scheduled jobs %>
+<section class="card u-mt-24">
+  <div class="card-header">
+    <h2 class="card-title">Scheduled jobs</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Job</th><th>Schedule</th><th>Last run</th><th style="text-align:right">Run</th></tr></thead>
+      <tbody>
+        <% scheduledJobs.forEach(function (job) {
+             const last = jobHistory.find(function (entry) { return entry.job_name === job.name; }); %>
+          <tr>
+            <td class="cell-strong"><%= job.name %></td>
+            <td class="cell-muted u-mono u-small"><%= job.cron %></td>
+            <td>
+              <% if (last) { %>
+                <span class="badge badge-<%= last.status === 'success' ? 'success'
+                  : last.status === 'failed' ? 'danger' : '' %>"><%= last.status %></span>
+                <br><span class="cell-muted u-small"><%= h.timeAgo(last.started_at) %></span>
+                <% if (last.message && last.status === 'failed') { %>
+                  <br><span class="cell-muted u-small"><%= h.truncate(last.message, 46) %></span>
+                <% } %>
+              <% } else { %>
+                <span class="cell-muted u-small">never</span>
+              <% } %>
+            </td>
+            <td class="cell-actions">
+              <form method="POST" action="<%= adminPath %>/jobs/<%= job.name %>/run" style="display:inline">
+                <%- csrfField() %>
+                <button type="submit" class="btn btn-sm"><ion-icon name="play-outline"></ion-icon></button>
+              </form>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var modal = document.querySelector('[data-restore-modal]');
+    if (!modal) return;
+    var form = modal.querySelector('[data-restore-form]');
+    var adminPath = document.body.dataset.adminPath || '/admin';
+
+    document.querySelectorAll('[data-restore]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        form.action = adminPath + '/backups/' + button.dataset.restore + '/restore';
+        modal.querySelector('[data-restore-filename]').textContent = button.dataset.filename;
+        form.querySelector('#restore-confirm').value = '';
+        modal.classList.add('is-open');
+        form.querySelector('#restore-confirm').focus();
+      });
+    });
+
+    modal.querySelector('[data-restore-cancel]').addEventListener('click', function () {
+      modal.classList.remove('is-open');
+    });
+    modal.addEventListener('click', function (event) {
+      if (event.target === modal) modal.classList.remove('is-open');
+    });
+  }());
+</script>
+
+<%- include('../partials/admin/foot') %>

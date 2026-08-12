@@ -1,0 +1,7 @@
+<%- include('./_shell', {
+  status: 429,
+  heading: "Too many requests",
+  body: typeof message !== 'undefined' && message && 429 < 500 ? message : "You have made too many requests in a short time. Please wait a moment and try again.",
+  stack: typeof stack !== 'undefined' ? stack : null,
+  isAdminArea: typeof isAdminArea !== 'undefined' ? isAdminArea : false,
+}) %>

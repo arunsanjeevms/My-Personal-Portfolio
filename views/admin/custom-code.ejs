@@ -1,0 +1,101 @@
+<%- include('../partials/admin/head') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Custom code</h1>
+    <p class="page-subtitle">Inject markup into every public page.</p>
+  </div>
+</div>
+
+<div class="alert alert-danger">
+  <ion-icon name="warning-outline"></ion-icon>
+  <div class="alert-body">
+    <div class="alert-title">This runs on your live site with no safety net</div>
+    Whatever you paste here is written into every public page <strong>exactly as typed</strong>
+    and executed in your visitors' browsers. It is not sanitised — that is the point of the
+    feature, and also its danger. Bad code here can break the site's layout, leak visitor
+    data, or hand your page to someone else.
+    <br><br>
+    Only paste code you understand and trust: analytics snippets, search-console
+    verification tags, and similar. Never paste something because a forum told you to.
+    Every change is recorded in the activity log with the full before and after.
+  </div>
+</div>
+
+<form method="POST" action="<%= adminPath %>/custom-code" data-guard>
+  <%- csrfField() %>
+
+  <%
+    const labels = {
+      head: ['Inside &lt;head&gt;', 'Meta tags, verification codes, analytics loaders. Runs before the page renders.'],
+      body_start: ['After &lt;body&gt; opens', 'Tag-manager noscript fallbacks and anything that must come first in the body.'],
+      body_end: ['Before &lt;/body&gt; closes', 'Scripts that should not delay rendering. Prefer this one where you can.'],
+    };
+  %>
+
+  <% blocks.forEach(function (block, index) { %>
+    <section class="card danger-zone <%= index ? 'u-mt-24' : '' %>">
+      <div class="card-header">
+        <h2 class="card-title"><%- labels[block.location][0] %></h2>
+        <div class="card-header-actions">
+          <span class="badge badge-<%= block.is_enabled ? 'warning' : '' %>">
+            <%= block.is_enabled ? 'active on the site' : 'inactive' %>
+          </span>
+        </div>
+      </div>
+
+      <p class="u-small u-muted" style="margin-bottom:14px"><%= labels[block.location][1] %></p>
+
+      <div class="form-row">
+        <label class="sr-only" for="code_<%= block.location %>">Code for <%= block.location %></label>
+        <textarea id="code_<%= block.location %>"
+                  name="code_<%= block.location %>"
+                  class="form-textarea code-editor"
+                  spellcheck="false"
+                  placeholder="<!-- paste your snippet here -->"><%= block.code || '' %></textarea>
+      </div>
+
+      <div class="form-check">
+        <input type="checkbox" id="enabled_<%= block.location %>" name="enabled_<%= block.location %>"
+               <%= block.is_enabled ? 'checked' : '' %>>
+        <label for="enabled_<%= block.location %>">Inject this block into the live site</label>
+      </div>
+
+      <% if (block.updated_at && block.code) { %>
+        <p class="form-hint u-mt-16">Last changed <%= h.timeAgo(block.updated_at) %>.</p>
+      <% } %>
+    </section>
+  <% }); %>
+
+  <section class="card u-mt-24">
+    <div class="card-header"><h2 class="card-title">Confirm</h2></div>
+    <div class="form-row">
+      <label class="form-label" for="password">Your password</label>
+      <input type="password" id="password" name="password" class="form-input"
+             autocomplete="current-password" required>
+      <p class="form-hint">
+        Required because this change affects every visitor to your site.
+      </p>
+    </div>
+
+    <button type="submit" class="btn btn-danger"
+            data-confirm="The code you have entered will be injected into every public page immediately. Check your site straight afterwards."
+            data-confirm-title="Save and inject this code?" data-confirm-action="Save and inject">
+      <ion-icon name="code-slash-outline"></ion-icon><span>Save custom code</span>
+    </button>
+  </section>
+</form>
+
+<section class="card u-mt-24">
+  <div class="card-header"><h2 class="card-title">If something breaks</h2></div>
+  <p class="u-small u-muted" style="line-height:1.8">
+    Untick the block and save — the site returns to normal immediately. If the site will not
+    render at all and you cannot reach this page, clear the blocks directly in the database:
+  </p>
+  <pre class="error-stack" style="margin-top:12px">UPDATE custom_code SET is_enabled = 0;</pre>
+  <p class="u-small u-muted" style="margin-top:10px">
+    The admin panel never renders custom code, so this page always stays reachable.
+  </p>
+</section>
+
+<%- include('../partials/admin/foot') %>

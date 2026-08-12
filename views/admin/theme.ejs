@@ -1,0 +1,99 @@
+<%- include('../partials/admin/head') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Theme</h1>
+    <p class="page-subtitle">
+      <%= changedCount ? changedCount + ' variable(s) changed from the original design' : 'Matching the original design' %>
+    </p>
+  </div>
+  <div class="page-header-actions">
+    <form method="POST" action="<%= adminPath %>/theme/reset" style="display:inline">
+      <%- csrfField() %>
+      <button type="submit" class="btn btn-danger"
+              data-confirm="Every colour and font returns to the values in your original stylesheet."
+              data-confirm-title="Reset the theme?" data-confirm-action="Reset">
+        <ion-icon name="refresh-outline"></ion-icon><span>Reset to original</span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<div class="alert alert-info">
+  <ion-icon name="information-circle-outline"></ion-icon>
+  <div class="alert-body">
+    <div class="alert-title">Only safe variables are exposed</div>
+    These map one-to-one to the CSS custom properties already declared in
+    <code>assets/css/style.css</code>. Layout, spacing, gradients and animations stay in the
+    stylesheet, so the design cannot be broken from here. Changed values are injected as a
+    small <code>:root</code> override; anything left at its default is not emitted at all.
+  </div>
+</div>
+
+<form method="POST" action="<%= adminPath %>/theme" data-guard>
+  <%- csrfField() %>
+
+  <% let first = true; %>
+  <% groups.forEach(function (variables, groupName) { %>
+    <section class="card <%= first ? '' : 'u-mt-24' %>">
+      <% first = false; %>
+      <div class="card-header">
+        <h2 class="card-title" style="text-transform:capitalize"><%= groupName %></h2>
+      </div>
+
+      <div class="form-grid">
+        <% variables.forEach(function (variable) { %>
+          <div class="form-row">
+            <label class="form-label" for="var-<%= variable.var_name.replace(/^--/, '') %>">
+              <%= variable.label %>
+              <% if (variable.var_value !== variable.default_value) { %>
+                <span class="badge badge-accent" style="margin-left:6px">changed</span>
+              <% } %>
+            </label>
+
+            <% if (variable.input_type === 'color') { %>
+              <div class="u-flex u-gap-8 u-items-center">
+                <%# The stored value is an hsl() string, which <input type=color>
+                    cannot display, so a swatch preview is shown beside a text field. %>
+                <span class="theme-swatch" style="background: <%= variable.var_value %>"
+                      title="<%= variable.var_value %>"></span>
+                <input type="text"
+                       id="var-<%= variable.var_name.replace(/^--/, '') %>"
+                       name="<%= variable.var_name %>"
+                       value="<%= variable.var_value %>"
+                       class="form-input u-mono"
+                       data-theme-var
+                       style="flex:1">
+              </div>
+            <% } else { %>
+              <input type="text"
+                     id="var-<%= variable.var_name.replace(/^--/, '') %>"
+                     name="<%= variable.var_name %>"
+                     value="<%= variable.var_value %>"
+                     class="form-input u-mono">
+            <% } %>
+
+            <p class="form-hint">
+              <%= variable.description %>
+              <br><span class="u-mono u-small"><%= variable.var_name %></span>
+              <% if (variable.var_value !== variable.default_value) { %>
+                · default <span class="u-mono u-small"><%= variable.default_value %></span>
+              <% } %>
+            </p>
+          </div>
+        <% }); %>
+      </div>
+    </section>
+  <% }); %>
+
+  <div class="u-flex u-gap-12 u-mt-24">
+    <button type="submit" class="btn btn-primary">
+      <ion-icon name="save-outline"></ion-icon><span>Save theme</span>
+    </button>
+    <a href="<%= siteUrl %>" target="_blank" rel="noopener" class="btn">
+      <ion-icon name="open-outline"></ion-icon><span>Preview site</span>
+    </a>
+  </div>
+</form>
+
+<%- include('../partials/admin/foot') %>

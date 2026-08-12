@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="csrf-token" content="<%= csrfToken() %>">
+  <title><%= typeof title !== 'undefined' && title ? title + ' · ' : '' %>Portfolio CMS</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/admin/css/admin.css">
+  <link rel="stylesheet" href="/static/admin/css/components.css">
+  <link rel="icon" href="/assets/images/logo.svg" type="image/svg+xml">
+</head>
+<body data-admin-path="<%= adminPath %>">
+
+<div class="admin-shell">
+
+  <%- include('./sidebar') %>
+  <div class="sidebar-backdrop" data-sidebar-backdrop></div>
+
+  <div class="admin-main">
+    <%- include('./topbar') %>
+
+    <main class="admin-content">
+      <%- include('./flash') %>

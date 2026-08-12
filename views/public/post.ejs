@@ -1,0 +1,54 @@
+<%# Native blog post page. Medium-sourced posts redirect to Medium and
+    never reach this template. %>
+<%- include('../partials/public/head') %>
+
+  <main>
+
+    <%- include('../partials/public/sidebar') %>
+
+    <div class="main-content">
+
+      <%- include('../partials/public/navbar') %>
+
+      <article class="blog active" data-page="blog">
+
+        <header>
+          <h2 class="h2 article-title"><%= post.title %></h2>
+        </header>
+
+        <section class="about-text">
+          <p style="margin-bottom:18px">
+            <a href="/blog" style="color:var(--orange-yellow-crayola)">&larr; All posts</a>
+          </p>
+
+          <div class="blog-meta" style="margin-bottom:20px">
+            <% if (post.category_name) { %><p class="blog-category"><%= post.category_name %></p><% } %>
+            <% if (post.published_at) { %>
+              <span class="dot"></span>
+              <time datetime="<%= new Date(post.published_at).toISOString() %>">
+                <%= h.formatDate(post.published_at) %>
+              </time>
+            <% } %>
+            <% if (post.reading_minutes) { %>
+              <span class="dot"></span>
+              <span><%= post.reading_minutes %> min read</span>
+            <% } %>
+          </div>
+
+          <% if (post.image) { %>
+            <figure class="blog-banner-box" style="margin-bottom:22px">
+              <img src="<%= post.image.url_path %>" alt="<%= post.title %>">
+            </figure>
+          <% } %>
+
+          <% if (post.content_html) { %>
+            <%# Sanitised on save and again here. %>
+            <div><%- post.content_html %></div>
+          <% } else if (post.excerpt) { %>
+            <p><%= post.excerpt %></p>
+          <% } %>
+        </section>
+
+      </article>
+
+<%- include('../partials/public/foot') %>

@@ -1,0 +1,110 @@
+<%# Project detail page. Reuses the sidebar and the article shell so it
+    sits inside the existing layout rather than looking like a new site. %>
+<%- include('../partials/public/head') %>
+
+  <main>
+
+    <%- include('../partials/public/sidebar') %>
+
+    <div class="main-content">
+
+      <%- include('../partials/public/navbar') %>
+
+      <article class="projects active" data-page="projects">
+
+        <header>
+          <h2 class="h2 article-title"><%= project.title %></h2>
+        </header>
+
+        <section class="about-text">
+          <p style="margin-bottom:18px">
+            <a href="/projects" style="color:var(--orange-yellow-crayola)">&larr; All projects</a>
+          </p>
+
+          <% if (project.image) { %>
+            <figure class="project-img" style="margin-bottom:22px">
+              <img src="<%= project.image.url_path %>" alt="<%= project.image_alt || project.title %>">
+            </figure>
+          <% } %>
+
+          <% if (project.category_label || project.category_name) { %>
+            <p class="project-category" style="margin-bottom:14px">
+              <%= project.category_label || project.category_name %>
+            </p>
+          <% } %>
+
+          <% if (project.short_description) { %>
+            <p style="margin-bottom:16px"><%= project.short_description %></p>
+          <% } %>
+
+          <% if (project.full_description) { %>
+            <%# Sanitised on save and again on render. %>
+            <div><%- project.full_description %></div>
+          <% } %>
+
+          <% if (project.technologies && project.technologies.length) { %>
+            <h3 class="h3" style="margin:24px 0 12px">Built with</h3>
+            <ul class="filter-list">
+              <% project.technologies.forEach(function (tech) { %>
+                <li class="filter-item"><button type="button"><%= tech.name %></button></li>
+              <% }); %>
+            </ul>
+          <% } %>
+
+          <%
+            const links = [
+              ['Live demo', project.live_url, 'open-outline'],
+              ['Source code', project.github_url, 'logo-github'],
+              ['Documentation', project.docs_url, 'document-text-outline'],
+              ['Video', project.video_url, 'videocam-outline'],
+            ].filter(function (entry) { return entry[1]; });
+          %>
+          <% if (links.length) { %>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:24px">
+              <% links.forEach(function (link) { %>
+                <a href="<%= link[1] %>" target="_blank" rel="noopener noreferrer" class="download-resume-btn">
+                  <ion-icon name="<%= link[2] %>"></ion-icon><span><%= link[0] %></span>
+                </a>
+              <% }); %>
+            </div>
+          <% } %>
+
+          <% if (project.gallery && project.gallery.length) { %>
+            <h3 class="h3" style="margin:28px 0 12px">Gallery</h3>
+            <ul class="project-list">
+              <% project.gallery.forEach(function (image) { %>
+                <li class="project-item active">
+                  <figure class="project-img">
+                    <img src="<%= image.url_path %>" alt="<%= image.alt || project.title %>" loading="lazy">
+                  </figure>
+                  <% if (image.caption) { %><p class="project-category"><%= image.caption %></p><% } %>
+                </li>
+              <% }); %>
+            </ul>
+          <% } %>
+
+          <%
+            const details = [
+              ['Role', project.role],
+              ['Client', project.client],
+              ['Team size', project.team_size],
+              ['Started', project.start_date ? h.formatDate(project.start_date) : null],
+              ['Completed', project.end_date ? h.formatDate(project.end_date) : null],
+            ].filter(function (entry) { return entry[1]; });
+          %>
+          <% if (details.length) { %>
+            <h3 class="h3" style="margin:28px 0 12px">Details</h3>
+            <ul class="timeline-list">
+              <% details.forEach(function (detail) { %>
+                <li class="timeline-item">
+                  <h4 class="h4 timeline-item-title"><%= detail[0] %></h4>
+                  <span><%= detail[1] %></span>
+                </li>
+              <% }); %>
+            </ul>
+          <% } %>
+        </section>
+
+      </article>
+
+<%- include('../partials/public/foot') %>

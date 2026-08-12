@@ -1,0 +1,7 @@
+<%- include('./_shell', {
+  status: 401,
+  heading: "Sign in required",
+  body: typeof message !== 'undefined' && message && 401 < 500 ? message : "You need to be signed in to view this page.",
+  stack: typeof stack !== 'undefined' ? stack : null,
+  isAdminArea: typeof isAdminArea !== 'undefined' ? isAdminArea : false,
+}) %>

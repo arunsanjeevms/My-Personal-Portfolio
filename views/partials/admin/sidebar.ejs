@@ -1,0 +1,44 @@
+<aside class="admin-sidebar" data-sidebar>
+
+  <a href="<%= adminPath %>/dashboard" class="sidebar-brand">
+    <span class="brand-mark" aria-hidden="true"><%= h.initials(currentUser ? currentUser.name : 'CMS') %></span>
+    <span class="brand-text">
+      <span class="brand-name">Portfolio CMS</span>
+      <span class="brand-sub">v<%= appVersion %><%= isProduction ? '' : ' · ' + env %></span>
+    </span>
+  </a>
+
+  <nav class="sidebar-nav" aria-label="Admin sections">
+    <% adminNav.forEach(function (group) { %>
+      <div class="nav-group">
+        <p class="nav-group-title"><%= group.group %></p>
+        <ul>
+          <% group.items.forEach(function (item) { %>
+            <li>
+              <% if (item.ready) { %>
+                <a href="<%= adminPath %><%= item.path %>"
+                   class="nav-link <%= activeNav === item.key ? 'active' : '' %> <%= item.danger ? 'is-danger' : '' %>"
+                   <%= activeNav === item.key ? 'aria-current="page"' : '' %>>
+                  <ion-icon name="<%= item.icon %>"></ion-icon>
+                  <span><%= item.label %></span>
+                  <% if (item.badge && typeof navBadges !== 'undefined' && navBadges[item.badge]) { %>
+                    <span class="nav-badge is-count"><%= navBadges[item.badge] %></span>
+                  <% } %>
+                </a>
+              <% } else { %>
+                <%# Not built yet. Rendered inert with a phase badge so the
+                    panel never presents a link that goes nowhere. %>
+                <span class="nav-link is-disabled" title="Arriving in phase <%= item.phase %>">
+                  <ion-icon name="<%= item.icon %>"></ion-icon>
+                  <span><%= item.label %></span>
+                  <span class="nav-badge">P<%= item.phase %></span>
+                </span>
+              <% } %>
+            </li>
+          <% }); %>
+        </ul>
+      </div>
+    <% }); %>
+  </nav>
+
+</aside>

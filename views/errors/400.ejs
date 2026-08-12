@@ -1,0 +1,7 @@
+<%- include('./_shell', {
+  status: 400,
+  heading: "Bad request",
+  body: typeof message !== 'undefined' && message && 400 < 500 ? message : "That request could not be understood. Check the form and try again.",
+  stack: typeof stack !== 'undefined' ? stack : null,
+  isAdminArea: typeof isAdminArea !== 'undefined' ? isAdminArea : false,
+}) %>

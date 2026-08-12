@@ -1,0 +1,320 @@
+<%
+/**
+ * The portfolio.
+ *
+ * Structurally identical to the original index.html: one page, five
+ * tabbed <article data-page> panels toggled by the existing script.js.
+ * The difference is that every value now comes from the database.
+ *
+ * `activePage` decides which tab is open on first paint, so /resume and
+ * /projects are real, server-rendered URLs rather than JS-only state.
+ */
+%>
+<%- include('../partials/public/head') %>
+
+  <main>
+
+    <%- include('../partials/public/sidebar') %>
+
+    <div class="main-content">
+
+      <%- include('../partials/public/navbar') %>
+
+      <%# ------------------------------------------------------- about %>
+      <% if (flags.show_about !== false) { %>
+        <article class="about <%= activePage === 'about' ? 'active' : '' %>" data-page="about">
+
+          <header>
+            <h2 class="h2 article-title"><%= sections.about_intro && sections.about_intro.title || 'About me' %></h2>
+          </header>
+
+          <% if (profile.about_html) { %>
+            <section class="about-text">
+              <%# Sanitised on save and again here before rendering. %>
+              <%- profile.about_html %>
+            </section>
+          <% } %>
+
+          <% if (flags.show_services !== false && services.length) { %>
+            <section class="service">
+              <h3 class="h3 service-title"><%= sections.services && sections.services.title || "What i'm Pursuing" %></h3>
+
+              <ul class="service-list">
+                <% services.forEach(function (service) { %>
+                  <li class="service-item">
+                    <% if (service.icon_type === 'image' && service.icon) { %>
+                      <div class="service-icon-box">
+                        <img src="<%= service.icon.url_path %>" alt="<%= service.icon_alt || service.title %>" width="40">
+                      </div>
+                    <% } else { %>
+                      <div class="arunicon">
+                        <ion-icon name="<%= service.icon_name || 'ellipse-outline' %>"></ion-icon>
+                      </div>
+                    <% } %>
+
+                    <div class="service-content-box">
+                      <h4 class="h4 service-item-title"><%= service.title %></h4>
+                      <p class="service-item-text"><%= service.description %></p>
+                    </div>
+                  </li>
+                <% }); %>
+              </ul>
+            </section>
+          <% } %>
+
+          <%# Modal container kept: script.js queries these nodes on load. %>
+          <div class="modal-container" data-modal-container>
+            <div class="overlay" data-overlay></div>
+            <section class="testimonials-modal">
+              <button class="modal-close-btn" data-modal-close-btn>
+                <ion-icon name="close-outline"></ion-icon>
+              </button>
+              <div class="modal-img-wrapper">
+                <figure class="modal-avatar-box">
+                  <img src="/assets/images/avatar-1.png" alt="" width="80" data-modal-img>
+                </figure>
+                <img src="/assets/images/icon-quote.svg" alt="quote icon">
+              </div>
+            </section>
+          </div>
+
+        </article>
+      <% } %>
+
+      <%# ------------------------------------------------------ resume %>
+      <% if (flags.show_resume !== false) { %>
+        <article class="resume <%= activePage === 'resume' ? 'active' : '' %>" data-page="resume">
+
+          <header class="resume-section-header">
+            <div class="resume-header">
+              <h2 class="h2 article-title">RESUME</h2>
+              <% if (profile.resume) { %>
+                <a href="/resume.pdf" target="_blank" rel="noopener" class="download-resume-btn">
+                  <ion-icon name="document-text-outline"></ion-icon>
+                  <span><%= profile.resume_label || 'Download Resume' %></span>
+                </a>
+              <% } %>
+            </div>
+          </header>
+
+          <% if (flags.show_education !== false && education.length) { %>
+            <section class="timeline">
+              <div class="title-wrapper">
+                <div class="icon-box"><ion-icon name="book-outline"></ion-icon></div>
+                <h3 class="h3"><%= sections.education && sections.education.title || 'EDUCATION' %></h3>
+              </div>
+
+              <ol class="timeline-list">
+                <% education.forEach(function (item) { %>
+                  <li class="timeline-item">
+                    <h4 class="h4 timeline-item-title"><%= item.institution %></h4>
+                    <% if (item.date_label) { %><span><%= item.date_label %></span><% } %>
+                    <% if (item.description) { %><p class="timeline-text"><%= item.description %></p><% } %>
+                  </li>
+                <% }); %>
+              </ol>
+            </section>
+          <% } %>
+
+          <% if (flags.show_experience !== false && experience.length) { %>
+            <section class="timeline">
+              <div class="title-wrapper">
+                <div class="icon-box"><ion-icon name="briefcase-outline"></ion-icon></div>
+                <h3 class="h3"><%= sections.experience && sections.experience.title || 'EXPERIENCE' %></h3>
+              </div>
+
+              <ol class="timeline-list">
+                <% experience.forEach(function (item) { %>
+                  <li class="timeline-item">
+                    <h4 class="h4 timeline-item-title"><%= item.position %> @ <%= item.company %></h4>
+                    <% if (item.date_label) { %><span><%= item.date_label %></span><% } %>
+                    <% if (item.description) { %><p class="timeline-text"><%= item.description %></p><% } %>
+                    <% if (item.bullets && item.bullets.length) { %>
+                      <ul class="timeline-text">
+                        <% item.bullets.forEach(function (bullet) { %>
+                          <li><%= bullet.content %></li>
+                        <% }); %>
+                      </ul>
+                    <% } %>
+                  </li>
+                <% }); %>
+              </ol>
+            </section>
+          <% } %>
+
+          <% if (flags.show_achievements !== false && achievements.length) { %>
+            <section class="timeline">
+              <div class="title-wrapper">
+                <div class="icon-box"><ion-icon name="trophy-outline"></ion-icon></div>
+                <h3 class="h3"><%= sections.achievements && sections.achievements.title || 'ACHIEVEMENTS' %></h3>
+              </div>
+
+              <ol class="timeline-list">
+                <% achievements.forEach(function (item) { %>
+                  <li class="timeline-item">
+                    <h4 class="h4 timeline-item-title"><%= item.title %></h4>
+                    <% if (item.date_label) { %><span><%= item.date_label %></span><% } %>
+                    <% if (item.description) { %><p class="timeline-text"><%= item.description %></p><% } %>
+                  </li>
+                <% }); %>
+              </ol>
+            </section>
+          <% } %>
+
+          <% if (flags.show_certifications !== false && certifications.length) { %>
+            <section class="timeline">
+              <div class="title-wrapper">
+                <div class="icon-box"><ion-icon name="ribbon-outline"></ion-icon></div>
+                <h3 class="h3"><%= sections.certifications && sections.certifications.title || 'CERTIFICATIONS' %></h3>
+              </div>
+
+              <ol class="timeline-list">
+                <% certifications.forEach(function (item) { %>
+                  <li class="timeline-item">
+                    <h4 class="h4 timeline-item-title">
+                      <% if (item.credential_url) { %>
+                        <a href="<%= item.credential_url %>" target="_blank" rel="noopener noreferrer"><%= item.name %></a>
+                      <% } else { %>
+                        <%= item.name %>
+                      <% } %>
+                    </h4>
+                    <% if (item.date_label) { %><span><%= item.date_label %></span><% } %>
+                    <% if (item.description) { %><p class="timeline-text"><%= item.description %></p><% } %>
+                  </li>
+                <% }); %>
+              </ol>
+            </section>
+          <% } %>
+
+          <% if (flags.show_skills !== false && skills.length) { %>
+            <section class="skill">
+              <h3 class="h3 skills-title"><%= sections.skills && sections.skills.title || 'Core Expertise' %></h3>
+
+              <ul class="skills-list content-card">
+                <% skills.forEach(function (skill) { %>
+                  <li class="skills-item">
+                    <div class="title-wrapper">
+                      <h5 class="h5"><%= skill.name %></h5>
+                    </div>
+                    <%# Discrete level-N bars, exactly as the original. %>
+                    <div class="skill-progress-bg" aria-label="<%= skill.aria_label || (skill.name + ' proficiency level') %>">
+                      <div class="skill-progress-fill level-<%= skill.level %>"></div>
+                    </div>
+                  </li>
+                <% }); %>
+              </ul>
+            </section>
+          <% } %>
+
+        </article>
+      <% } %>
+
+      <%# ---------------------------------------------------- projects %>
+      <% if (flags.show_projects !== false) { %>
+        <article class="projects <%= activePage === 'projects' ? 'active' : '' %>" data-page="projects">
+
+          <header>
+            <h2 class="h2 article-title"><%= sections.projects && sections.projects.title || 'Projects' %></h2>
+          </header>
+
+          <section class="projects">
+
+            <ul class="filter-list">
+              <li class="filter-item"><button class="active" data-filter-btn>All</button></li>
+              <% projectCategories.forEach(function (category) { %>
+                <li class="filter-item"><button data-filter-btn><%= category.name %></button></li>
+              <% }); %>
+            </ul>
+
+            <div class="filter-select-box">
+              <button class="filter-select" data-select>
+                <div class="select-value" data-selecct-value>Select category</div>
+                <div class="select-icon"><ion-icon name="chevron-down"></ion-icon></div>
+              </button>
+
+              <ul class="select-list">
+                <li class="select-item"><button data-select-item>All</button></li>
+                <% projectCategories.forEach(function (category) { %>
+                  <li class="select-item"><button data-select-item><%= category.name %></button></li>
+                <% }); %>
+              </ul>
+            </div>
+
+            <% if (projects.length) { %>
+              <ul class="project-list">
+                <% projects.forEach(function (project) { %>
+                  <%
+                    // Detail pages are feature-flagged; until they are on,
+                    // cards link out exactly as they do today.
+                    const href = flags.show_project_details
+                      ? ('/projects/' + project.slug)
+                      : (project.primary_url || project.live_url || project.github_url || '#');
+                    const external = !flags.show_project_details && project.open_in_new_tab;
+                  %>
+                  <li class="project-item active" data-filter-item data-category="<%= project.category_slug || '' %>">
+                    <a href="<%= href %>" <%= external ? 'target="_blank" rel="noopener noreferrer"' : '' %>>
+
+                      <figure class="project-img">
+                        <div class="project-item-icon-box">
+                          <ion-icon name="eye-outline"></ion-icon>
+                        </div>
+                        <% if (project.image) { %>
+                          <img src="<%= project.image.url_path %>"
+                               alt="<%= project.image_alt || project.title %>" loading="lazy">
+                        <% } else { %>
+                          <img src="/assets/images/project-1.jpg" alt="<%= project.title %>" loading="lazy">
+                        <% } %>
+                      </figure>
+
+                      <h3 class="project-title"><%= project.title %></h3>
+                      <p class="project-category"><%= project.category_label || project.category_name || '' %></p>
+
+                    </a>
+                  </li>
+                <% }); %>
+              </ul>
+            <% } else { %>
+              <p class="project-category" style="margin-top:20px">Projects are being updated. Please check back soon.</p>
+            <% } %>
+
+          </section>
+        </article>
+      <% } %>
+
+      <%# -------------------------------------------------------- blog %>
+      <% if (flags.show_blog !== false) { %>
+        <article class="blog <%= activePage === 'blog' ? 'active' : '' %>" data-page="blog">
+
+          <header>
+            <h2 class="h2 article-title"><%= sections.blog && sections.blog.title || 'Blog' %></h2>
+          </header>
+
+          <section class="blog-posts">
+            <%- include('../partials/public/blog-list') %>
+          </section>
+        </article>
+      <% } %>
+
+      <%# ----------------------------------------------------- contact %>
+      <% if (flags.show_contact !== false) { %>
+        <article class="contact <%= activePage === 'contact' ? 'active' : '' %>" data-page="contact">
+
+          <header>
+            <h2 class="h2 article-title">Contact</h2>
+          </header>
+
+          <% if (flags.show_map !== false && settings.google_maps_url) { %>
+            <section class="mapbox" data-mapbox>
+              <figure>
+                <iframe src="<%= settings.google_maps_url %>" width="400" height="300"
+                        loading="lazy" title="Map"></iframe>
+              </figure>
+            </section>
+          <% } %>
+
+          <%- include('../partials/public/contact-form') %>
+
+        </article>
+      <% } %>
+
+<%- include('../partials/public/foot') %>

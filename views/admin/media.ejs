@@ -1,0 +1,164 @@
+<%- include('../partials/admin/head') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Media library</h1>
+    <p class="page-subtitle"><%= h.formatNumber(result.total) %> file<%= result.total === 1 ? '' : 's' %></p>
+  </div>
+</div>
+
+<section class="card">
+  <div class="card-header"><h2 class="card-title">Upload</h2></div>
+
+  <form method="POST" action="<%= adminPath %>/media/upload" enctype="multipart/form-data" data-guard>
+    <%- csrfField() %>
+    <div class="form-grid">
+      <div class="form-row" style="grid-column:1/-1">
+        <label class="form-label" for="files">Choose files</label>
+        <input type="file" id="files" name="files" multiple class="form-input"
+               accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml,image/x-icon,application/pdf">
+        <p class="form-hint">
+          JPG, PNG, GIF, WebP, SVG, ICO or PDF · up to <%= maxUploadMb %> MB each · 10 files at a time.
+          Images are re-encoded on upload, which strips EXIF data (including GPS location) and any
+          hidden payload. Thumbnail, medium and large WebP versions are generated automatically.
+        </p>
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="folder">Folder</label>
+        <input type="text" id="folder" name="folder" value="general" class="form-input" list="folder-list">
+        <datalist id="folder-list">
+          <% folders.forEach(function (f) { %><option value="<%= f.folder %>"><% }); %>
+        </datalist>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">
+      <ion-icon name="cloud-upload-outline"></ion-icon><span>Upload</span>
+    </button>
+  </form>
+</section>
+
+<form method="GET" action="<%= adminPath %>/media" class="card u-mt-24" style="padding:14px 16px">
+  <div class="u-flex u-gap-12 u-items-center" style="flex-wrap:wrap">
+    <div class="topbar-search" style="width:auto;flex:1;min-width:200px;display:flex">
+      <ion-icon name="search-outline"></ion-icon>
+      <label class="sr-only" for="q">Search files</label>
+      <input type="search" id="q" name="q" value="<%= searchTerm %>" placeholder="Search by name or alt text…">
+    </div>
+    <select name="kind" class="form-select" style="width:auto;min-width:150px" aria-label="File type">
+      <option value="">All types</option>
+      <option value="image" <%= activeKind === 'image' ? 'selected' : '' %>>Images</option>
+      <option value="document" <%= activeKind === 'document' ? 'selected' : '' %>>Documents</option>
+    </select>
+    <select name="folder" class="form-select" style="width:auto;min-width:150px" aria-label="Folder">
+      <option value="">All folders</option>
+      <% folders.forEach(function (f) { %>
+        <option value="<%= f.folder %>" <%= activeFolder === f.folder ? 'selected' : '' %>>
+          <%= f.folder %> (<%= f.total %>)
+        </option>
+      <% }); %>
+    </select>
+    <button type="submit" class="btn"><ion-icon name="funnel-outline"></ion-icon><span>Filter</span></button>
+    <% if (searchTerm || activeKind || activeFolder) { %>
+      <a href="<%= adminPath %>/media" class="btn btn-ghost">Clear</a>
+    <% } %>
+  </div>
+</form>
+
+<% if (result.rows.length) { %>
+  <div class="media-grid u-mt-24">
+    <% result.rows.forEach(function (item) { %>
+      <article class="media-card">
+        <div class="media-card-preview">
+          <% if (item.kind === 'image') { %>
+            <img src="<%= adminPath %>/media/<%= item.id %>/thumb" alt="<%= item.alt || item.original_name %>" loading="lazy">
+          <% } else { %>
+            <span class="media-placeholder"><ion-icon name="document-text-outline"></ion-icon></span>
+          <% } %>
+        </div>
+
+        <div class="media-card-body">
+          <p class="media-card-name u-truncate" title="<%= item.original_name %>"><%= item.original_name %></p>
+          <p class="media-card-meta">
+            <%= h.formatBytes(item.size_bytes) %>
+            <% if (item.width) { %> · <%= item.width %>×<%= item.height %><% } %>
+            · <%= h.timeAgo(item.created_at) %>
+          </p>
+          <% if (!item.alt && item.kind === 'image') { %>
+            <p class="media-card-meta" style="color:var(--admin-warning)">
+              <ion-icon name="warning-outline" style="font-size:12px"></ion-icon> No alt text
+            </p>
+          <% } %>
+        </div>
+
+        <div class="media-card-actions">
+          <button type="button" class="btn btn-sm btn-ghost" data-copy="<%= siteUrl %><%= item.url_path %>" title="Copy URL">
+            <ion-icon name="link-outline"></ion-icon>
+          </button>
+          <a href="<%= item.url_path %>" target="_blank" rel="noopener" class="btn btn-sm btn-ghost" title="Open">
+            <ion-icon name="open-outline"></ion-icon>
+          </a>
+          <button type="button" class="btn btn-sm btn-ghost" data-media-edit="<%= item.id %>"
+                  data-name="<%= item.original_name %>" data-alt="<%= item.alt || '' %>"
+                  data-title-text="<%= item.title || '' %>" data-caption="<%= item.caption || '' %>"
+                  data-folder="<%= item.folder %>" title="Edit details">
+            <ion-icon name="create-outline"></ion-icon>
+          </button>
+          <form method="POST" action="<%= adminPath %>/media/<%= item.id %>/delete" style="display:inline">
+            <%- csrfField() %>
+            <button type="submit" class="btn btn-sm btn-ghost" style="color:var(--admin-danger)"
+                    data-confirm="&quot;<%= item.original_name %>&quot; will be deleted from disk. Anywhere it is used will fall back to no image."
+                    data-confirm-title="Delete this file?" data-confirm-action="Delete" title="Delete">
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
+          </form>
+        </div>
+      </article>
+    <% }); %>
+  </div>
+
+  <%- include('../partials/admin/pagination', { result: result, baseUrl: adminPath + '/media' }) %>
+
+<% } else { %>
+  <section class="card u-mt-24">
+    <div class="empty-state">
+      <div class="empty-icon"><ion-icon name="images-outline"></ion-icon></div>
+      <p class="empty-title"><%= searchTerm ? 'No files matched' : 'No files yet' %></p>
+      <p class="empty-text">
+        Upload images for your projects, certificates, logos, and your resume PDF.
+      </p>
+    </div>
+  </section>
+<% } %>
+
+<%# ------------------------------------------------ edit details modal %>
+<div class="modal-backdrop" data-media-edit-modal role="dialog" aria-modal="true">
+  <div class="modal">
+    <h2 class="modal-title">File details</h2>
+    <form method="POST" action="" data-media-edit-form>
+      <%- csrfField() %>
+      <div class="form-row">
+        <label class="form-label" for="edit-alt">Alt text</label>
+        <input type="text" id="edit-alt" name="alt" class="form-input">
+        <p class="form-hint">Describes the image for screen readers and search engines.</p>
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="edit-title">Title</label>
+        <input type="text" id="edit-title" name="title" class="form-input">
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="edit-caption">Caption</label>
+        <input type="text" id="edit-caption" name="caption" class="form-input">
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="edit-folder">Folder</label>
+        <input type="text" id="edit-folder" name="folder" class="form-input">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn" data-media-edit-cancel>Cancel</button>
+        <button type="submit" class="btn btn-primary">Save details</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/admin/foot') %>

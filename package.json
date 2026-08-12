@@ -1,0 +1,45 @@
+{
+  "name": "portfolio-cms",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Full-stack CMS behind the arunsanjeev.dev portfolio (Express + MySQL/MariaDB)",
+  "author": "Arun Sanjeev M S",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "setup": "node scripts/setup.js",
+    "migrate": "node scripts/migrate.js",
+    "migrate:status": "node scripts/migrate.js --status",
+    "seed": "node scripts/seed.js",
+    "create-admin": "node scripts/create-admin.js",
+    "schema:dump": "node scripts/dump-schema.js",
+    "test": "node --test --test-concurrency=1 --test-force-exit \"tests/*.test.js\""
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "compression": "^1.8.0",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.0.0",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-mysql-session": "^3.0.3",
+    "express-rate-limit": "^7.5.0",
+    "express-session": "^1.18.1",
+    "express-validator": "^7.2.1",
+    "helmet": "^8.1.0",
+    "multer": "^2.2.0",
+    "mysql2": "^3.14.0",
+    "node-cron": "^4.6.0",
+    "nodemailer": "^9.0.5",
+    "otplib": "^12.0.1",
+    "qrcode": "^1.5.4",
+    "sharp": "^0.35.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

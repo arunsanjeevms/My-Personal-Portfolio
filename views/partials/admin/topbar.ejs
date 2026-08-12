@@ -1,0 +1,78 @@
+<header class="admin-topbar">
+
+  <button type="button" class="icon-btn sidebar-toggle" data-sidebar-toggle aria-label="Toggle navigation">
+    <ion-icon name="menu-outline"></ion-icon>
+  </button>
+
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <% if (breadcrumbs && breadcrumbs.length) { %>
+      <% breadcrumbs.forEach(function (crumb, index) { %>
+        <% if (index > 0) { %><span class="sep">/</span><% } %>
+        <% if (crumb.url && index < breadcrumbs.length - 1) { %>
+          <a href="<%= crumb.url %>" class="crumb"><%= crumb.label %></a>
+        <% } else { %>
+          <span class="crumb crumb-current"><%= crumb.label %></span>
+        <% } %>
+      <% }); %>
+    <% } %>
+  </nav>
+
+  <div class="topbar-actions">
+
+    <div class="topbar-search">
+      <ion-icon name="search-outline"></ion-icon>
+      <label class="sr-only" for="admin-search">Search the admin panel</label>
+      <input type="search" id="admin-search" data-admin-search placeholder="Search…" autocomplete="off">
+      <kbd>Ctrl K</kbd>
+    </div>
+
+    <a href="<%= siteUrl %>" target="_blank" rel="noopener" class="icon-btn" title="View the live site">
+      <ion-icon name="open-outline"></ion-icon>
+    </a>
+
+    <button type="button" class="icon-btn" title="Notifications" aria-label="Notifications">
+      <ion-icon name="notifications-outline"></ion-icon>
+      <% if (typeof navBadges !== 'undefined' && navBadges && navBadges.notifications_unread) { %>
+        <span class="dot"></span>
+      <% } %>
+    </button>
+
+    <div class="user-menu">
+      <button type="button" class="user-menu-trigger" data-dropdown-trigger="user"
+              aria-haspopup="true" aria-expanded="false">
+        <span class="user-avatar" aria-hidden="true"><%= h.initials(currentUser.name) %></span>
+        <span>
+          <span class="user-menu-name"><%= currentUser.name %></span><br>
+          <span class="user-menu-role"><%= currentUser.roleName %></span>
+        </span>
+        <ion-icon name="chevron-down-outline" style="font-size:14px"></ion-icon>
+      </button>
+
+      <div class="user-dropdown" data-dropdown="user" role="menu">
+        <div class="dropdown-header">
+          <div class="cell-strong" style="color:var(--white-2);font-size:var(--fs-7)"><%= currentUser.name %></div>
+          <div class="dropdown-email"><%= currentUser.email %></div>
+        </div>
+
+        <a href="<%= adminPath %>/password/change" class="dropdown-item" role="menuitem">
+          <ion-icon name="key-outline"></ion-icon>
+          <span>Change password</span>
+        </a>
+
+        <a href="<%= adminPath %>/system" class="dropdown-item" role="menuitem">
+          <ion-icon name="pulse-outline"></ion-icon>
+          <span>System health</span>
+        </a>
+
+        <form method="POST" action="<%= adminPath %>/logout">
+          <%- csrfField() %>
+          <button type="submit" class="dropdown-item is-danger" role="menuitem">
+            <ion-icon name="log-out-outline"></ion-icon>
+            <span>Sign out</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</header>

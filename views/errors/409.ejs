@@ -1,0 +1,7 @@
+<%- include('./_shell', {
+  status: 409,
+  heading: "Conflict",
+  body: typeof message !== 'undefined' && message && 409 < 500 ? message : "That change conflicts with something that already exists.",
+  stack: typeof stack !== 'undefined' ? stack : null,
+  isAdminArea: typeof isAdminArea !== 'undefined' ? isAdminArea : false,
+}) %>

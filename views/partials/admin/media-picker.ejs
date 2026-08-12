@@ -1,0 +1,34 @@
+<%# Media picker modal. Included by any form containing a media field.
+    Populated over fetch from /admin/media/browse. %>
+<div class="modal-backdrop" data-media-picker role="dialog" aria-modal="true" aria-labelledby="media-picker-title">
+  <div class="modal" style="width:min(760px,100%)">
+    <div class="u-flex u-items-center u-gap-12" style="margin-bottom:16px">
+      <h2 class="modal-title u-mb-0" id="media-picker-title">Choose a file</h2>
+      <button type="button" class="btn btn-sm btn-ghost" data-media-picker-close style="margin-left:auto">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
+
+    <div class="topbar-search" style="width:100%;display:flex;margin-bottom:14px">
+      <ion-icon name="search-outline"></ion-icon>
+      <label class="sr-only" for="picker-search">Search files</label>
+      <input type="search" id="picker-search" data-media-picker-search placeholder="Search files…">
+    </div>
+
+    <div class="media-picker-grid" data-media-picker-grid>
+      <div class="u-center u-muted" style="padding:32px;grid-column:1/-1">
+        <span class="spinner" style="margin:0 auto"></span>
+      </div>
+    </div>
+
+    <div class="u-flex u-gap-12 u-items-center u-mt-16">
+      <a href="<%= adminPath %>/media" target="_blank" rel="noopener" class="btn btn-sm btn-ghost">
+        <ion-icon name="cloud-upload-outline"></ion-icon><span>Upload new</span>
+      </a>
+      <span style="flex:1"></span>
+      <button type="button" class="btn btn-sm" data-media-picker-prev>Previous</button>
+      <span class="u-small u-muted" data-media-picker-page></span>
+      <button type="button" class="btn btn-sm" data-media-picker-next>Next</button>
+    </div>
+  </div>
+</div>

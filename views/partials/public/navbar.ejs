@@ -1,0 +1,29 @@
+<%# Navigation, driven by the navigation table.
+
+    The original script.js matched a tab by comparing the button's text to
+    the article's data-page attribute, which broke as soon as a label was
+    renamed. Each button now carries an explicit data-nav-target, and
+    data-nav-url lets the rewritten script update the address bar. %>
+<nav class="navbar">
+
+  <ul class="navbar-list">
+    <% navigation.filter(function (item) { return !item.parent_id; }).forEach(function (item) { %>
+      <li class="navbar-item">
+        <% if (item.link_type === 'page') { %>
+          <button class="navbar-link <%= activePage === item.target_page ? 'active' : '' %>"
+                  data-nav-link
+                  data-nav-target="<%= item.target_page %>"
+                  data-nav-url="<%= pageUrls[item.target_page] || '/' %>">
+            <%= item.label %>
+          </button>
+        <% } else { %>
+          <a class="navbar-link" href="<%= item.url || '#' %>"
+             <%= item.open_in_new_tab ? 'target="_blank" rel="noopener noreferrer"' : '' %>>
+            <%= item.label %>
+          </a>
+        <% } %>
+      </li>
+    <% }); %>
+  </ul>
+
+</nav>

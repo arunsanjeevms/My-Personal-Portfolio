@@ -1,0 +1,200 @@
+<%- include('../../partials/admin/head') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title"><%= isEdit ? 'Edit' : 'New' %> <%= resource.singular.toLowerCase() %></h1>
+    <% if (isEdit && row) { %>
+      <p class="page-subtitle">
+        Last updated <%= h.timeAgo(row.updated_at) %>
+        <% if (row.created_at) { %> · created <%= h.formatDate(row.created_at) %><% } %>
+      </p>
+    <% } %>
+  </div>
+  <div class="page-header-actions">
+    <a href="<%= adminPath %>/<%= resource.key %>" class="btn">
+      <ion-icon name="arrow-back-outline"></ion-icon><span>Back to list</span>
+    </a>
+  </div>
+</div>
+
+<% if (Object.keys(formErrors).length) { %>
+  <div class="alert alert-danger">
+    <ion-icon name="alert-circle-outline"></ion-icon>
+    <div class="alert-body">
+      <div class="alert-title">Please fix <%= Object.keys(formErrors).length %> field<%= Object.keys(formErrors).length === 1 ? '' : 's' %></div>
+      Nothing has been saved yet.
+    </div>
+  </div>
+<% } %>
+
+<form method="POST"
+      action="<%= adminPath %>/<%= resource.key %><%= isEdit ? '/' + row.id : '' %>"
+      data-guard novalidate>
+  <%- csrfField() %>
+
+  <% let groupIndex = 0; %>
+  <% groups.forEach(function (fields, groupName) { groupIndex += 1; %>
+    <section class="card <%= groupIndex > 1 ? 'u-mt-24' : '' %>">
+      <div class="card-header">
+        <h2 class="card-title"><%= groupName %></h2>
+      </div>
+
+      <div class="form-grid">
+        <% fields.forEach(function (field) { %>
+          <%
+            const value = values[field.name];
+            const error = formErrors[field.name];
+            // Long-form inputs take the full width of the grid.
+            const fullWidth = ['textarea', 'richtext', 'tags'].includes(field.type);
+          %>
+          <div class="form-row" style="<%= fullWidth ? 'grid-column:1/-1' : '' %>">
+
+            <% if (field.type !== 'checkbox') { %>
+              <label class="form-label" for="field-<%= field.name %>">
+                <%= field.label %><% if (field.required) { %> <span class="req">*</span><% } %>
+              </label>
+            <% } %>
+
+            <% /* ---------------------------------------- text-like */ %>
+            <% if (['text', 'url', 'email'].includes(field.type)) { %>
+              <input type="<%= field.type === 'text' ? 'text' : field.type %>"
+                     id="field-<%= field.name %>"
+                     name="<%= field.name %>"
+                     value="<%= value || '' %>"
+                     class="form-input <%= error ? 'has-error' : '' %>"
+                     <%= field.maxLength ? 'maxlength=' + field.maxLength : '' %>
+                     <%= field.slugSource ? 'data-slug-source="' + resource.key + '"' : '' %>>
+
+            <% /* ---------------------------------------------- slug */ %>
+            <% } else if (field.type === 'slug') { %>
+              <input type="text"
+                     id="field-<%= field.name %>"
+                     name="<%= field.name %>"
+                     value="<%= value || '' %>"
+                     class="form-input u-mono <%= error ? 'has-error' : '' %>"
+                     data-slug-target="<%= resource.key %>">
+
+            <% /* ------------------------------------------ textarea */ %>
+            <% } else if (field.type === 'textarea' || field.type === 'tags') { %>
+              <textarea id="field-<%= field.name %>"
+                        name="<%= field.name %>"
+                        rows="<%= field.rows || (field.type === 'tags' ? 4 : 3) %>"
+                        class="form-textarea <%= error ? 'has-error' : '' %>"
+                        <%= field.maxLength ? 'maxlength=' + field.maxLength : '' %>><%= value || '' %></textarea>
+
+            <% /* ------------------------------------------ richtext */ %>
+            <% } else if (field.type === 'richtext') { %>
+              <textarea id="field-<%= field.name %>"
+                        name="<%= field.name %>"
+                        rows="10"
+                        class="form-textarea u-mono <%= error ? 'has-error' : '' %>"
+                        style="font-size:var(--fs-8)"><%= value || '' %></textarea>
+              <p class="form-hint">
+                Limited HTML is allowed: <code>p, br, b, strong, i, em, u, a, ul, ol, li, h3-h5,
+                blockquote, code, pre, hr</code>. Everything else — including scripts, styles and
+                event handlers — is stripped when saved and again when displayed.
+              </p>
+
+            <% /* -------------------------------------------- number */ %>
+            <% } else if (field.type === 'number') { %>
+              <input type="number"
+                     id="field-<%= field.name %>"
+                     name="<%= field.name %>"
+                     value="<%= value === null || value === undefined ? '' : value %>"
+                     step="<%= field.step || '1' %>"
+                     class="form-input <%= error ? 'has-error' : '' %>">
+
+            <% /* ---------------------------------------------- date */ %>
+            <% } else if (field.type === 'date') { %>
+              <input type="date"
+                     id="field-<%= field.name %>"
+                     name="<%= field.name %>"
+                     value="<%= value || '' %>"
+                     class="form-input <%= error ? 'has-error' : '' %>">
+
+            <% /* -------------------------------------- select/level */ %>
+            <% } else if (field.type === 'select' || field.type === 'level') { %>
+              <select id="field-<%= field.name %>" name="<%= field.name %>"
+                      class="form-select <%= error ? 'has-error' : '' %>">
+                <% if (!field.required) { %><option value="">— none —</option><% } %>
+                <% const options = field.options || selectOptions[field.name] || []; %>
+                <% options.forEach(function (option) { %>
+                  <option value="<%= option.value %>" <%= String(value) === String(option.value) ? 'selected' : '' %>>
+                    <%= option.label %>
+                  </option>
+                <% }); %>
+              </select>
+
+            <% /* ------------------------------------------ checkbox */ %>
+            <% } else if (field.type === 'checkbox') { %>
+              <div class="form-check">
+                <input type="checkbox" id="field-<%= field.name %>" name="<%= field.name %>"
+                       <%= value ? 'checked' : '' %>>
+                <label for="field-<%= field.name %>"><%= field.label %></label>
+              </div>
+
+            <% /* --------------------------------------------- media */ %>
+            <% } else if (field.type === 'media') { %>
+              <div class="media-field" data-media-field>
+                <input type="hidden" id="field-<%= field.name %>" name="<%= field.name %>"
+                       value="<%= value || '' %>" data-media-input>
+                <div class="media-preview" data-media-preview>
+                  <% if (value) { %>
+                    <img src="<%= adminPath %>/media/<%= value %>/thumb" alt="">
+                  <% } else { %>
+                    <span class="media-placeholder"><ion-icon name="image-outline"></ion-icon></span>
+                  <% } %>
+                </div>
+                <div class="u-flex u-gap-8" style="flex-wrap:wrap">
+                  <button type="button" class="btn btn-sm" data-media-pick
+                          data-accept="<%= field.accept || 'image' %>">
+                    <ion-icon name="images-outline"></ion-icon><span>Choose</span>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-ghost" data-media-clear
+                          <%= value ? '' : 'hidden' %>>
+                    <ion-icon name="close-outline"></ion-icon><span>Remove</span>
+                  </button>
+                </div>
+              </div>
+
+            <% } %>
+
+            <% if (field.hint && field.type !== 'richtext') { %>
+              <p class="form-hint"><%= field.hint %></p>
+            <% } %>
+            <% if (error) { %>
+              <p class="form-error"><ion-icon name="alert-circle-outline"></ion-icon><%= error %></p>
+            <% } %>
+          </div>
+        <% }); %>
+      </div>
+    </section>
+  <% }); %>
+
+  <div class="u-flex u-gap-12 u-mt-24" style="flex-wrap:wrap">
+    <button type="submit" class="btn btn-primary">
+      <ion-icon name="save-outline"></ion-icon>
+      <span><%= isEdit ? 'Save changes' : 'Create ' + resource.singular.toLowerCase() %></span>
+    </button>
+    <a href="<%= adminPath %>/<%= resource.key %>" class="btn">Cancel</a>
+
+    <% if (isEdit) { %>
+      <span style="flex:1"></span>
+    <% } %>
+  </div>
+</form>
+
+<% if (isEdit) { %>
+  <form method="POST" action="<%= adminPath %>/<%= resource.key %>/<%= row.id %>/delete" class="u-mt-24">
+    <%- csrfField() %>
+    <button type="submit" class="btn btn-danger"
+            data-confirm="This removes this <%= resource.singular.toLowerCase() %> from your portfolio.<%= resource.softDelete ? ' It can be restored from the database if needed.' : ' This cannot be undone.' %>"
+            data-confirm-title="Delete this <%= resource.singular.toLowerCase() %>?"
+            data-confirm-action="Delete">
+      <ion-icon name="trash-outline"></ion-icon><span>Delete <%= resource.singular.toLowerCase() %></span>
+    </button>
+  </form>
+<% } %>
+
+<%- include('../../partials/admin/media-picker') %>
+<%- include('../../partials/admin/foot') %>

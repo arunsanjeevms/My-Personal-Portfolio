@@ -1,0 +1,7 @@
+<%- include('./_shell', {
+  status: typeof status !== 'undefined' ? status : 500,
+  heading: typeof title !== 'undefined' && title ? title : 'Something went wrong',
+  body: typeof message !== 'undefined' && message ? message : 'An unexpected error occurred.',
+  stack: typeof stack !== 'undefined' ? stack : null,
+  isAdminArea: typeof isAdminArea !== 'undefined' ? isAdminArea : false,
+}) %>

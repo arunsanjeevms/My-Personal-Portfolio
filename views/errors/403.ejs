@@ -1,0 +1,7 @@
+<%- include('./_shell', {
+  status: 403,
+  heading: "Not allowed",
+  body: typeof message !== 'undefined' && message && 403 < 500 ? message : "You do not have permission to view this page. If you think that is wrong, ask a Super Admin to check your role.",
+  stack: typeof stack !== 'undefined' ? stack : null,
+  isAdminArea: typeof isAdminArea !== 'undefined' ? isAdminArea : false,
+}) %>

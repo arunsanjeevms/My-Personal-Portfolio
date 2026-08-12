@@ -1,0 +1,100 @@
+<%- include('../partials/admin/head') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Redirects</h1>
+    <p class="page-subtitle">Send old URLs to new ones so existing links and search rankings survive.</p>
+  </div>
+</div>
+
+<section class="card">
+  <div class="card-header"><h2 class="card-title">Add a redirect</h2></div>
+
+  <form method="POST" action="<%= adminPath %>/redirects" data-guard>
+    <%- csrfField() %>
+
+    <div class="form-grid">
+      <div class="form-row">
+        <label class="form-label" for="source_path">From <span class="req">*</span></label>
+        <input type="text" id="source_path" name="source_path" class="form-input u-mono <%= formErrors.source_path ? 'has-error' : '' %>"
+               placeholder="/old-project" required>
+        <% if (formErrors.source_path) { %>
+          <p class="form-error"><ion-icon name="alert-circle-outline"></ion-icon><%= formErrors.source_path %></p>
+        <% } %>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label" for="destination">To <span class="req">*</span></label>
+        <input type="text" id="destination" name="destination" class="form-input u-mono <%= formErrors.destination ? 'has-error' : '' %>"
+               placeholder="/projects/new-project" required>
+        <p class="form-hint">A path on this site, or a full external URL.</p>
+        <% if (formErrors.destination) { %>
+          <p class="form-error"><ion-icon name="alert-circle-outline"></ion-icon><%= formErrors.destination %></p>
+        <% } %>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label" for="status_code">Type</label>
+        <select id="status_code" name="status_code" class="form-select">
+          <option value="301">301 — permanent (passes search ranking)</option>
+          <option value="302">302 — temporary</option>
+        </select>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+      <ion-icon name="add-outline"></ion-icon><span>Add redirect</span>
+    </button>
+  </form>
+</section>
+
+<section class="card u-mt-24" style="padding:0">
+  <% if (rows.length) { %>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>From</th><th>To</th><th>Type</th><th>Hits</th><th>Created</th>
+            <th style="text-align:right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% rows.forEach(function (row) { %>
+            <tr>
+              <td class="cell-strong u-mono"><%= row.source_path %></td>
+              <td class="cell-muted u-mono"><%= h.truncate(row.destination, 44) %></td>
+              <td><span class="badge <%= row.status_code === 301 ? 'badge-success' : 'badge-warning' %>"><%= row.status_code %></span></td>
+              <td>
+                <%= h.formatNumber(row.hit_count) %>
+                <% if (row.last_hit_at) { %>
+                  <span class="cell-muted u-small"><br><%= h.timeAgo(row.last_hit_at) %></span>
+                <% } %>
+              </td>
+              <td class="cell-muted"><%= h.formatDate(row.created_at) %></td>
+              <td class="cell-actions">
+                <form method="POST" action="<%= adminPath %>/redirects/<%= row.id %>/delete" style="display:inline">
+                  <%- csrfField() %>
+                  <button type="submit" class="btn btn-sm btn-danger"
+                          data-confirm="Visitors following <%= row.source_path %> will get a 404 instead."
+                          data-confirm-title="Delete this redirect?" data-confirm-action="Delete">
+                    <ion-icon name="trash-outline"></ion-icon>
+                  </button>
+                </form>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %>
+    <div class="empty-state">
+      <div class="empty-icon"><ion-icon name="git-branch-outline"></ion-icon></div>
+      <p class="empty-title">No redirects yet</p>
+      <p class="empty-text">
+        Add one when you rename a project slug or retire a page, so existing links keep working.
+      </p>
+    </div>
+  <% } %>
+</section>
+
+<%- include('../partials/admin/foot') %>

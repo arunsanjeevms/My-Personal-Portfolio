@@ -1,0 +1,38 @@
+<%
+/**
+ * Pagination. Expects `result` ({page, pages, total}) and `baseUrl`.
+ * Preserves the current query string apart from `page`.
+ */
+if (result.pages > 1) {
+  const windowSize = 2;
+  const from = Math.max(1, result.page - windowSize);
+  const to = Math.min(result.pages, result.page + windowSize);
+%>
+<nav class="pagination" aria-label="Pagination">
+  <a href="<%= baseUrl %><%= h.withQuery(query, { page: result.page - 1 }) %>"
+     class="page-link <%= result.page <= 1 ? 'is-disabled' : '' %>" aria-label="Previous page">
+    <ion-icon name="chevron-back-outline"></ion-icon>
+  </a>
+
+  <% if (from > 1) { %>
+    <a href="<%= baseUrl %><%= h.withQuery(query, { page: 1 }) %>" class="page-link">1</a>
+    <% if (from > 2) { %><span class="page-link is-disabled">…</span><% } %>
+  <% } %>
+
+  <% for (let p = from; p <= to; p += 1) { %>
+    <a href="<%= baseUrl %><%= h.withQuery(query, { page: p }) %>"
+       class="page-link <%= p === result.page ? 'is-active' : '' %>"
+       <%= p === result.page ? 'aria-current="page"' : '' %>><%= p %></a>
+  <% } %>
+
+  <% if (to < result.pages) { %>
+    <% if (to < result.pages - 1) { %><span class="page-link is-disabled">…</span><% } %>
+    <a href="<%= baseUrl %><%= h.withQuery(query, { page: result.pages }) %>" class="page-link"><%= result.pages %></a>
+  <% } %>
+
+  <a href="<%= baseUrl %><%= h.withQuery(query, { page: result.page + 1 }) %>"
+     class="page-link <%= result.page >= result.pages ? 'is-disabled' : '' %>" aria-label="Next page">
+    <ion-icon name="chevron-forward-outline"></ion-icon>
+  </a>
+</nav>
+<% } %>

@@ -1,0 +1,189 @@
+<%- include('../../partials/admin/head') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title"><%= resource.label %></h1>
+    <p class="page-subtitle">
+      <%= h.formatNumber(result.total) %> <%= result.total === 1 ? resource.singular.toLowerCase() : resource.label.toLowerCase() %>
+      <% if (searchTerm) { %> matching "<%= searchTerm %>"<% } %>
+    </p>
+  </div>
+  <div class="page-header-actions">
+    <% if (resource.key === 'projects') { %>
+      <a href="<%= adminPath %>/project-categories" class="btn">
+        <ion-icon name="pricetags-outline"></ion-icon><span>Categories</span>
+      </a>
+    <% } else if (resource.key === 'skills') { %>
+      <a href="<%= adminPath %>/skill-categories" class="btn">
+        <ion-icon name="pricetags-outline"></ion-icon><span>Categories</span>
+      </a>
+    <% } %>
+    <a href="<%= adminPath %>/<%= resource.key %>/new" class="btn btn-primary">
+      <ion-icon name="add-outline"></ion-icon><span>New <%= resource.singular.toLowerCase() %></span>
+    </a>
+  </div>
+</div>
+
+<%# --------------------------------------------------- search + filters %>
+<form method="GET" action="<%= adminPath %>/<%= resource.key %>" class="card u-mb-0" style="padding:14px 16px;margin-bottom:18px">
+  <div class="u-flex u-gap-12 u-items-center" style="flex-wrap:wrap">
+    <div class="topbar-search" style="width:auto;flex:1;min-width:200px;display:flex">
+      <ion-icon name="search-outline"></ion-icon>
+      <label class="sr-only" for="q">Search <%= resource.label.toLowerCase() %></label>
+      <input type="search" id="q" name="q" value="<%= searchTerm %>" placeholder="Search <%= resource.label.toLowerCase() %>…">
+    </div>
+
+    <% (resource.filters || []).forEach(function (filter) { %>
+      <div>
+        <label class="sr-only" for="filter-<%= filter.name %>"><%= filter.label %></label>
+        <select name="<%= filter.name %>" id="filter-<%= filter.name %>" class="form-select" style="width:auto;min-width:160px">
+          <option value="">All <%= filter.label.toLowerCase() %></option>
+          <% const opts = filter.options || selectOptions[filter.name] || []; %>
+          <% opts.forEach(function (option) { %>
+            <option value="<%= option.value %>" <%= String(activeFilters[filter.name] || '') === String(option.value) ? 'selected' : '' %>>
+              <%= option.label %>
+            </option>
+          <% }); %>
+        </select>
+      </div>
+    <% }); %>
+
+    <button type="submit" class="btn"><ion-icon name="funnel-outline"></ion-icon><span>Apply</span></button>
+    <% if (searchTerm || Object.values(activeFilters).some(Boolean)) { %>
+      <a href="<%= adminPath %>/<%= resource.key %>" class="btn btn-ghost">Clear</a>
+    <% } %>
+  </div>
+</form>
+
+<%# ------------------------------------------------------------- table %>
+<section class="card" style="padding:0">
+  <% if (result.rows.length) { %>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:80px">Order</th>
+            <% resource.listColumns.forEach(function (column) { %>
+              <th><%= column.label %></th>
+            <% }); %>
+            <th style="text-align:right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% result.rows.forEach(function (row, rowIndex) { %>
+            <tr>
+              <td>
+                <div class="u-flex u-gap-8">
+                  <form method="POST" action="<%= adminPath %>/<%= resource.key %>/<%= row.id %>/move" style="display:inline">
+                    <%- csrfField() %>
+                    <input type="hidden" name="direction" value="up">
+                    <button type="submit" class="btn btn-sm btn-ghost" aria-label="Move up"
+                            <%= rowIndex === 0 && result.page === 1 ? 'disabled' : '' %>>
+                      <ion-icon name="chevron-up-outline"></ion-icon>
+                    </button>
+                  </form>
+                  <form method="POST" action="<%= adminPath %>/<%= resource.key %>/<%= row.id %>/move" style="display:inline">
+                    <%- csrfField() %>
+                    <input type="hidden" name="direction" value="down">
+                    <button type="submit" class="btn btn-sm btn-ghost" aria-label="Move down"
+                            <%= rowIndex === result.rows.length - 1 && result.page === result.pages ? 'disabled' : '' %>>
+                      <ion-icon name="chevron-down-outline"></ion-icon>
+                    </button>
+                  </form>
+                </div>
+              </td>
+
+              <% resource.listColumns.forEach(function (column) { %>
+                <td class="<%= column.primary ? 'cell-strong' : '' %> <%= column.muted ? 'cell-muted' : '' %> <%= column.mono ? 'u-mono' : '' %>">
+                  <% const value = row[column.key]; %>
+
+                  <% if (column.type === 'boolean') { %>
+                    <% if (value) { %>
+                      <span class="badge badge-success"><ion-icon name="checkmark-outline"></ion-icon>Yes</span>
+                    <% } else { %>
+                      <span class="badge">No</span>
+                    <% } %>
+
+                  <% } else if (column.type === 'status') { %>
+                    <span class="badge badge-<%= value === 'published' ? 'success' : 'warning' %>"><%= value %></span>
+
+                  <% } else if (column.type === 'level') { %>
+                    <span class="badge badge-accent">Level <%= value %>/5</span>
+
+                  <% } else if (column.type === 'thumb') { %>
+                    <% if (value) { %>
+                      <img src="<%= adminPath %>/media/<%= value %>/thumb" alt=""
+                           style="width:44px;height:32px;object-fit:cover;border-radius:6px">
+                    <% } else { %>
+                      <span class="cell-muted u-small">—</span>
+                    <% } %>
+
+                  <% } else if (column.primary) { %>
+                    <a href="<%= adminPath %>/<%= resource.key %>/<%= row.id %>/edit" style="color:var(--white-2)">
+                      <%= value || '(untitled)' %>
+                    </a>
+
+                  <% } else { %>
+                    <%= column.truncate ? h.truncate(value, column.truncate) : (value || '—') %>
+                  <% } %>
+                </td>
+              <% }); %>
+
+              <td class="cell-actions">
+                <div class="u-flex u-gap-8" style="justify-content:flex-end">
+                  <form method="POST" action="<%= adminPath %>/<%= resource.key %>/<%= row.id %>/toggle" style="display:inline">
+                    <%- csrfField() %>
+                    <button type="submit" class="btn btn-sm btn-ghost"
+                            title="<%= (row.is_active === 0 || row.status === 'draft') ? 'Show on the site' : 'Hide from the site' %>">
+                      <ion-icon name="<%= (row.is_active === 0 || row.status === 'draft') ? 'eye-off-outline' : 'eye-outline' %>"></ion-icon>
+                    </button>
+                  </form>
+
+                  <a href="<%= adminPath %>/<%= resource.key %>/<%= row.id %>/edit" class="btn btn-sm">
+                    <ion-icon name="create-outline"></ion-icon>
+                  </a>
+
+                  <form method="POST" action="<%= adminPath %>/<%= resource.key %>/<%= row.id %>/delete" style="display:inline">
+                    <%- csrfField() %>
+                    <button type="submit" class="btn btn-sm btn-danger"
+                            data-confirm="This will remove &quot;<%= (row.title || row.name || row.label || row.position || row.institution || row.platform || 'this item') %>&quot; from your portfolio."
+                            data-confirm-title="Delete <%= resource.singular.toLowerCase() %>?"
+                            data-confirm-action="Delete">
+                      <ion-icon name="trash-outline"></ion-icon>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+
+    <%- include('../../partials/admin/pagination', { result: result, baseUrl: adminPath + '/' + resource.key }) %>
+
+  <% } else { %>
+    <div class="empty-state">
+      <div class="empty-icon"><ion-icon name="<%= resource.icon %>"></ion-icon></div>
+      <p class="empty-title">
+        <%= searchTerm ? 'Nothing matched your search' : 'No ' + resource.label.toLowerCase() + ' yet' %>
+      </p>
+      <p class="empty-text">
+        <% if (searchTerm) { %>
+          Try a different search term, or clear the filters.
+        <% } else { %>
+          Add your first <%= resource.singular.toLowerCase() %> and it will appear on the public site straight away.
+        <% } %>
+      </p>
+      <% if (searchTerm) { %>
+        <a href="<%= adminPath %>/<%= resource.key %>" class="btn">Clear search</a>
+      <% } else { %>
+        <a href="<%= adminPath %>/<%= resource.key %>/new" class="btn btn-primary">
+          <ion-icon name="add-outline"></ion-icon><span>New <%= resource.singular.toLowerCase() %></span>
+        </a>
+      <% } %>
+    </div>
+  <% } %>
+</section>
+
+<%- include('../../partials/admin/foot') %>

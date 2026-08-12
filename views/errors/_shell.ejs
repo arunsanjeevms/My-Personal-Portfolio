@@ -1,0 +1,54 @@
+<%
+/**
+ * Shared error page shell.
+ *
+ * Expects: status, heading, body, message, stack (may be null), isAdminArea.
+ * `stack` is only ever populated outside production - see errorHandler.js.
+ */
+%><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title><%= status %> · <%= heading %></title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/admin/css/admin.css">
+</head>
+<body>
+
+<main class="error-page">
+  <div>
+    <p class="error-code"><%= status %></p>
+    <h1 class="error-title"><%= heading %></h1>
+    <p class="error-text"><%= body %></p>
+
+    <div class="error-actions">
+      <% if (isAdminArea) { %>
+        <a href="<%= adminPath %>/dashboard" class="btn btn-primary">
+          <ion-icon name="grid-outline"></ion-icon><span>Back to dashboard</span>
+        </a>
+      <% } else { %>
+        <a href="/" class="btn btn-primary">
+          <ion-icon name="home-outline"></ion-icon><span>Back to the portfolio</span>
+        </a>
+      <% } %>
+      <button type="button" class="btn" onclick="history.back()">
+        <ion-icon name="arrow-back-outline"></ion-icon><span>Go back</span>
+      </button>
+    </div>
+
+    <% if (stack) { %>
+      <pre class="error-stack"><%= stack %></pre>
+    <% } %>
+  </div>
+</main>
+
+<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+</body>
+</html>

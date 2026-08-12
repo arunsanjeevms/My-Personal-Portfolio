@@ -1,0 +1,69 @@
+<%# Contact form.
+
+    Previously posted to api.web3forms.com with a public access key
+    committed to the repository. It now posts to this application:
+    CSRF-protected, rate-limited, honeypot-guarded, stored in
+    contact_messages and surfaced in the admin inbox. %>
+<section class="contact-form">
+  <h3 class="h3 form-title"><%= sections.contact_form && sections.contact_form.title || 'Contact Form' %></h3>
+
+  <% if (typeof contactStatus !== 'undefined' && contactStatus) { %>
+    <p class="form-notice form-notice--<%= contactStatus.type %>" role="status">
+      <%= contactStatus.message %>
+    </p>
+  <% } %>
+
+  <%
+    /**
+     * CSRF token strategy.
+     *
+     * This form lives in the DOM of every page, because the site is a
+     * single page with tabs. Emitting a token here unconditionally would
+     * mint a session for every anonymous visitor and every crawler, and
+     * would make each response unique - defeating ETag revalidation and
+     * any downstream caching.
+     *
+     * So: on /contact, where the visitor has clearly arrived to use the
+     * form, the token is rendered inline and the form works with no
+     * JavaScript at all. On every other page it is fetched on first
+     * interaction, keeping those pages anonymous and cacheable.
+     */
+    const inlineToken = activePage === 'contact';
+  %>
+  <form action="/contact" method="POST" id="contact-form" data-form
+        <%= inlineToken ? '' : 'data-csrf-lazy' %>>
+    <% if (inlineToken) { %>
+      <%- csrfField() %>
+    <% } else { %>
+      <input type="hidden" name="_csrf" value="">
+    <% } %>
+
+    <%# Honeypot: hidden from people, tempting to bots. A filled value is
+        accepted with a success message but never stored. %>
+    <div class="form-hp" aria-hidden="true">
+      <label for="website">Leave this field empty</label>
+      <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+    </div>
+
+    <div class="input-wrapper">
+      <input type="text" name="fullname" class="form-input" placeholder="Full name" required
+             maxlength="120" value="<%= typeof contactValues !== 'undefined' ? (contactValues.fullname || '') : '' %>"
+             data-form-input>
+      <input type="email" name="email" class="form-input" placeholder="Email address" required
+             maxlength="190" value="<%= typeof contactValues !== 'undefined' ? (contactValues.email || '') : '' %>"
+             data-form-input>
+    </div>
+
+    <input type="text" name="subject" class="form-input" placeholder="Subject (optional)"
+           maxlength="200" value="<%= typeof contactValues !== 'undefined' ? (contactValues.subject || '') : '' %>">
+
+    <textarea name="message" class="form-input" placeholder="Your Message" required
+              maxlength="5000" data-form-input><%= typeof contactValues !== 'undefined' ? (contactValues.message || '') : '' %></textarea>
+
+    <button class="form-btn" type="submit" data-form-btn>
+      <ion-icon name="paper-plane"></ion-icon>
+      <span>Send Message</span>
+    </button>
+  </form>
+
+</section>

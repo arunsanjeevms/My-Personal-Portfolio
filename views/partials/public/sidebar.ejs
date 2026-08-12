@@ -1,0 +1,118 @@
+<%# Sidebar. Same markup as the original index.html; every value is now
+    read from the profile and social_links tables. %>
+<aside class="sidebar" data-sidebar>
+
+  <div class="sidebar-info">
+
+    <figure class="avatar-box">
+      <% if (profile && profile.photo) { %>
+        <img src="<%= profile.photo.url_path %>"
+             alt="<%= profile.photo_alt || profile.full_name %>"
+             width="80" loading="eager" fetchpriority="high" decoding="async">
+      <% } else { %>
+        <%# Fallback keeps the layout intact when no photo is set. %>
+        <img src="/assets/images/my-avatar.png" alt="<%= profile ? profile.full_name : '' %>"
+             width="80" loading="eager" decoding="async">
+      <% } %>
+    </figure>
+
+    <div class="info-content">
+      <h1 class="name" title="<%= profile.full_name %>"><%= profile.full_name %></h1>
+
+      <div class="title-group">
+        <% if (profile.professional_title) { %>
+          <p class="title"><%= profile.professional_title %></p>
+        <% } %>
+        <% if (profile.secondary_title) { %>
+          <p class="title title-highlight"><%= profile.secondary_title %></p>
+        <% } %>
+      </div>
+    </div>
+
+    <button class="info_more-btn" data-sidebar-btn>
+      <span>Show Contacts</span>
+      <ion-icon name="chevron-down"></ion-icon>
+    </button>
+
+  </div>
+
+  <div class="sidebar-info_more">
+
+    <div class="separator"></div>
+
+    <ul class="contacts-list">
+
+      <% if (profile.show_email && profile.email) { %>
+        <li class="contact-item">
+          <div class="icon-box"><ion-icon name="mail-outline"></ion-icon></div>
+          <div class="contact-info">
+            <p class="contact-title">Email</p>
+            <%
+              // Rebuilds the pre-filled mailto: link the original site used.
+              let mailto = 'mailto:' + profile.email;
+              const params = [];
+              if (profile.email_subject) params.push('subject=' + encodeURIComponent(profile.email_subject));
+              if (profile.email_body) params.push('body=' + encodeURIComponent(profile.email_body));
+              if (params.length) mailto += '?' + params.join('&');
+            %>
+            <a href="<%= mailto %>" class="contact-link"><%= profile.email %></a>
+          </div>
+        </li>
+      <% } %>
+
+      <% if (profile.show_phone && profile.phone) { %>
+        <li class="contact-item">
+          <div class="icon-box"><ion-icon name="phone-portrait-outline"></ion-icon></div>
+          <div class="contact-info">
+            <p class="contact-title">Phone</p>
+            <a href="tel:<%= profile.phone.replace(/[^+0-9]/g, '') %>" class="contact-link"><%= profile.phone %></a>
+          </div>
+        </li>
+      <% } %>
+
+      <% if (profile.show_birthday && profile.birthday) { %>
+        <li class="contact-item">
+          <div class="icon-box"><ion-icon name="calendar-outline"></ion-icon></div>
+          <div class="contact-info">
+            <p class="contact-title">Birthday</p>
+            <time datetime="<%= String(profile.birthday).slice(0, 10) %>"><%= h.formatDate(profile.birthday) %></time>
+          </div>
+        </li>
+      <% } %>
+
+      <% if (profile.show_location && profile.location_html) { %>
+        <li class="contact-item">
+          <div class="icon-box"><ion-icon name="location-outline"></ion-icon></div>
+          <div class="contact-info">
+            <p class="contact-title">Location</p>
+            <%# Commas become line breaks, matching the original layout. %>
+            <address><%- profile.location_html.split(',').map(function (part) {
+              return h.escapeHtml(part.trim());
+            }).join(' <br> ') %></address>
+          </div>
+        </li>
+      <% } %>
+
+    </ul>
+
+    <% const sidebarSocial = social.filter(function (link) { return link.show_in_sidebar; }); %>
+    <% if (sidebarSocial.length) { %>
+      <div class="separator"></div>
+
+      <ul class="social-list">
+        <% sidebarSocial.forEach(function (link) { %>
+          <li class="social-item">
+            <a href="<%= link.url %>"
+               <%= link.open_in_new_tab ? 'target="_blank" rel="noopener noreferrer"' : '' %>
+               class="social-link"
+               aria-label="<%= link.label || link.platform %>">
+              <ion-icon name="<%= link.icon_name || 'link-outline' %>"></ion-icon>
+            </a>
+          </li>
+        <% }); %>
+      </ul>
+    <% } %>
+
+  </div>
+
+</aside>

@@ -1,0 +1,20 @@
+<%# Flash messages are handed to the client as data attributes and shown
+    as toasts by admin.js. Rendered as empty divs so they occupy no space
+    if JavaScript is unavailable - in that case the <noscript> block below
+    shows them inline instead. %>
+<% if (flash && flash.length) { %>
+  <% flash.forEach(function (item) { %>
+    <div data-flash
+         data-flash-type="<%= item.type %>"
+         data-flash-message="<%= item.message %>"></div>
+  <% }); %>
+
+  <noscript>
+    <% flash.forEach(function (item) { %>
+      <div class="alert alert-<%= item.type === 'error' ? 'danger' : item.type %>">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        <div class="alert-body"><%= item.message %></div>
+      </div>
+    <% }); %>
+  </noscript>
+<% } %>

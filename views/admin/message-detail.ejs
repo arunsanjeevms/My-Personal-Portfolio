@@ -1,0 +1,128 @@
+<%- include('../partials/admin/head') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title"><%= message.subject || '(no subject)' %></h1>
+    <p class="page-subtitle">
+      From <strong style="color:var(--white-2)"><%= message.name %></strong>
+      &lt;<%= message.email %>&gt; · <%= h.formatDateTime(message.created_at) %>
+    </p>
+  </div>
+  <div class="page-header-actions">
+    <a href="<%= adminPath %>/messages" class="btn">
+      <ion-icon name="arrow-back-outline"></ion-icon><span>Back to inbox</span>
+    </a>
+    <a href="mailto:<%= message.email %>?subject=<%= encodeURIComponent('Re: ' + (message.subject || 'Your message')) %>"
+       class="btn btn-primary">
+      <ion-icon name="mail-outline"></ion-icon><span>Reply by email</span>
+    </a>
+  </div>
+</div>
+
+<% if (message.spam_score >= 40) { %>
+  <div class="alert alert-warning">
+    <ion-icon name="warning-outline"></ion-icon>
+    <div class="alert-body">
+      <div class="alert-title">Flagged as possible spam (score <%= message.spam_score %>/100)</div>
+      Scored on link count, keywords and message shape. It was kept rather than discarded, so
+      you can judge for yourself.
+    </div>
+  </div>
+<% } %>
+
+<div class="grid grid-2">
+
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title">Message</h2>
+      <div class="card-header-actions">
+        <span class="badge badge-<%= message.status === 'unread' ? 'accent'
+          : message.status === 'replied' ? 'success'
+          : message.status === 'spam' ? 'danger' : '' %>"><%= message.status %></span>
+      </div>
+    </div>
+
+    <div class="message-body"><%= message.message %></div>
+
+    <div class="card-header u-mt-24" style="margin-bottom:14px"><h2 class="card-title">Private notes</h2></div>
+    <form method="POST" action="<%= adminPath %>/messages/<%= message.id %>/notes" data-guard>
+      <%- csrfField() %>
+      <div class="form-row">
+        <label class="sr-only" for="admin_notes">Notes</label>
+        <textarea id="admin_notes" name="admin_notes" rows="4" class="form-textarea"
+                  placeholder="Notes for yourself. Never shown to the sender."><%= message.admin_notes || '' %></textarea>
+      </div>
+      <button type="submit" class="btn btn-sm">
+        <ion-icon name="save-outline"></ion-icon><span>Save notes</span>
+      </button>
+    </form>
+  </section>
+
+  <div>
+    <section class="card">
+      <div class="card-header"><h2 class="card-title">Details</h2></div>
+      <div class="detail-list">
+        <div class="detail-row">
+          <span class="detail-label">From</span>
+          <span class="detail-value"><%= message.name %></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Email</span>
+          <span class="detail-value"><a href="mailto:<%= message.email %>" style="color:var(--orange-yellow-crayola)"><%= message.email %></a></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Received</span>
+          <span class="detail-value"><%= h.formatDateTime(message.created_at) %></span>
+        </div>
+        <% if (message.referrer) { %>
+          <div class="detail-row">
+            <span class="detail-label">Came from</span>
+            <span class="detail-value"><%= message.referrer %></span>
+          </div>
+        <% } %>
+        <div class="detail-row">
+          <span class="detail-label">Spam score</span>
+          <span class="detail-value"><%= message.spam_score %>/100</span>
+        </div>
+        <% if (message.replied_at) { %>
+          <div class="detail-row">
+            <span class="detail-label">Replied</span>
+            <span class="detail-value"><%= h.formatDateTime(message.replied_at) %></span>
+          </div>
+        <% } %>
+      </div>
+
+      <p class="form-hint u-mt-16">
+        The sender's IP address is not stored — only a salted hash, which cannot be
+        reversed back to an address.
+      </p>
+    </section>
+
+    <section class="card u-mt-24">
+      <div class="card-header"><h2 class="card-title">Status</h2></div>
+
+      <form method="POST" action="<%= adminPath %>/messages/<%= message.id %>/status">
+        <%- csrfField() %>
+        <div class="u-flex u-gap-8" style="flex-wrap:wrap">
+          <% statuses.forEach(function (status) { %>
+            <button type="submit" name="status" value="<%= status %>"
+                    class="btn btn-sm <%= message.status === status ? 'btn-primary' : '' %>"
+                    style="text-transform:capitalize"><%= status %></button>
+          <% }); %>
+        </div>
+      </form>
+
+      <form method="POST" action="<%= adminPath %>/messages/<%= message.id %>/delete" class="u-mt-24">
+        <%- csrfField() %>
+        <button type="submit" class="btn btn-danger btn-block"
+                data-confirm="This message will be removed from your inbox."
+                data-confirm-title="Delete this message?" data-confirm-action="Delete">
+          <ion-icon name="trash-outline"></ion-icon><span>Delete message</span>
+        </button>
+      </form>
+    </section>
+  </div>
+
+</div>
+
+<%- include('../partials/admin/foot') %>

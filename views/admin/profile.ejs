@@ -1,0 +1,255 @@
+<%- include('../partials/admin/head') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Profile</h1>
+    <p class="page-subtitle">Your identity, contact details and resume — everything the sidebar shows.</p>
+  </div>
+</div>
+
+<% if (Object.keys(formErrors).length) { %>
+  <div class="alert alert-danger">
+    <ion-icon name="alert-circle-outline"></ion-icon>
+    <div class="alert-body">Please fix the highlighted fields. Nothing has been saved.</div>
+  </div>
+<% } %>
+
+<form method="POST" action="<%= adminPath %>/profile" data-guard novalidate>
+  <%- csrfField() %>
+
+  <section class="card">
+    <div class="card-header"><h2 class="card-title">Identity</h2></div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label class="form-label" for="full_name">Full name <span class="req">*</span></label>
+        <input type="text" id="full_name" name="full_name" value="<%= profile.full_name || '' %>"
+               class="form-input <%= formErrors.full_name ? 'has-error' : '' %>" required>
+        <p class="form-hint">Shown as the main heading in the sidebar.</p>
+        <% if (formErrors.full_name) { %><p class="form-error"><ion-icon name="alert-circle-outline"></ion-icon><%= formErrors.full_name %></p><% } %>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label" for="display_name">Display name</label>
+        <input type="text" id="display_name" name="display_name" value="<%= profile.display_name || '' %>" class="form-input">
+        <p class="form-hint">Shorter form used in titles and emails.</p>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label" for="professional_title">Professional title</label>
+        <input type="text" id="professional_title" name="professional_title" value="<%= profile.professional_title || '' %>" class="form-input">
+        <p class="form-hint">First line under your name, e.g. "Pre-Final Year CSE Student".</p>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label" for="secondary_title">Highlighted second title</label>
+        <input type="text" id="secondary_title" name="secondary_title" value="<%= profile.secondary_title || '' %>" class="form-input">
+        <p class="form-hint">The gold highlight line, e.g. "3x National Hackathon Winner".</p>
+      </div>
+
+      <div class="form-row" style="grid-column:1/-1">
+        <label class="form-label" for="tagline">Tagline</label>
+        <input type="text" id="tagline" name="tagline" value="<%= profile.tagline || '' %>" class="form-input">
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">Profile photo</label>
+        <div class="media-field" data-media-field>
+          <input type="hidden" name="photo_media_id" value="<%= profile.photo_media_id || '' %>" data-media-input>
+          <div class="media-preview" data-media-preview>
+            <% if (profile.photo_media_id) { %>
+              <img src="<%= adminPath %>/media/<%= profile.photo_media_id %>/thumb" alt="">
+            <% } else { %>
+              <span class="media-placeholder"><ion-icon name="person-outline"></ion-icon></span>
+            <% } %>
+          </div>
+          <div class="u-flex u-gap-8">
+            <button type="button" class="btn btn-sm" data-media-pick data-accept="image">
+              <ion-icon name="images-outline"></ion-icon><span>Choose</span>
+            </button>
+            <button type="button" class="btn btn-sm btn-ghost" data-media-clear <%= profile.photo_media_id ? '' : 'hidden' %>>
+              <ion-icon name="close-outline"></ion-icon><span>Remove</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label" for="photo_alt">Photo alt text</label>
+        <input type="text" id="photo_alt" name="photo_alt" value="<%= profile.photo_alt || '' %>" class="form-input">
+        <p class="form-hint">Describes the photo for screen readers.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card u-mt-24">
+    <div class="card-header"><h2 class="card-title">About</h2></div>
+    <div class="form-row">
+      <label class="form-label" for="about_html">About text</label>
+      <textarea id="about_html" name="about_html" rows="12" class="form-textarea u-mono"
+                style="font-size:var(--fs-8)"><%= profile.about_html || '' %></textarea>
+      <p class="form-hint">
+        The intro paragraph on the About tab. Limited HTML is allowed
+        (<code>p, br, b, strong, i, em, ul, li, a</code>); scripts, styles and event
+        handlers are stripped on save and again on display.
+      </p>
+    </div>
+    <div class="form-row">
+      <label class="form-label" for="short_bio">Short bio</label>
+      <textarea id="short_bio" name="short_bio" rows="3" class="form-textarea" maxlength="500"><%= profile.short_bio || '' %></textarea>
+      <p class="form-hint">Plain-text summary used for meta descriptions and structured data.</p>
+    </div>
+  </section>
+
+  <section class="card u-mt-24">
+    <div class="card-header"><h2 class="card-title">Contact</h2></div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label class="form-label" for="email">Email</label>
+        <input type="email" id="email" name="email" value="<%= profile.email || '' %>"
+               class="form-input <%= formErrors.email ? 'has-error' : '' %>">
+        <% if (formErrors.email) { %><p class="form-error"><ion-icon name="alert-circle-outline"></ion-icon><%= formErrors.email %></p><% } %>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label" for="phone">Phone</label>
+        <input type="text" id="phone" name="phone" value="<%= profile.phone || '' %>" class="form-input">
+      </div>
+
+      <div class="form-row" style="grid-column:1/-1">
+        <label class="form-label" for="email_subject">Pre-filled email subject</label>
+        <input type="text" id="email_subject" name="email_subject" value="<%= profile.email_subject || '' %>" class="form-input">
+        <p class="form-hint">Used in the sidebar mailto: link.</p>
+      </div>
+
+      <div class="form-row" style="grid-column:1/-1">
+        <label class="form-label" for="email_body">Pre-filled email body</label>
+        <textarea id="email_body" name="email_body" rows="3" class="form-textarea"><%= profile.email_body || '' %></textarea>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label" for="whatsapp_url">WhatsApp link</label>
+        <input type="url" id="whatsapp_url" name="whatsapp_url" value="<%= profile.whatsapp_url || '' %>"
+               class="form-input <%= formErrors.whatsapp_url ? 'has-error' : '' %>">
+        <% if (formErrors.whatsapp_url) { %><p class="form-error"><ion-icon name="alert-circle-outline"></ion-icon><%= formErrors.whatsapp_url %></p><% } %>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label" for="birthday">Birthday</label>
+        <input type="date" id="birthday" name="birthday"
+               value="<%= profile.birthday ? String(profile.birthday).slice(0,10) : '' %>" class="form-input">
+      </div>
+
+      <div class="form-row" style="grid-column:1/-1">
+        <label class="form-label" for="location_html">Location (as displayed)</label>
+        <input type="text" id="location_html" name="location_html" value="<%= profile.location_html || '' %>" class="form-input">
+        <p class="form-hint">Shown in the sidebar. Use commas to separate lines, e.g. "Namakkal, Tamil Nadu, India".</p>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label" for="city">City</label>
+        <input type="text" id="city" name="city" value="<%= profile.city || '' %>" class="form-input">
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="state">State</label>
+        <input type="text" id="state" name="state" value="<%= profile.state || '' %>" class="form-input">
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="country">Country</label>
+        <input type="text" id="country" name="country" value="<%= profile.country || '' %>" class="form-input">
+      </div>
+    </div>
+
+    <div class="card-header u-mt-24" style="margin-bottom:14px"><h2 class="card-title">What to show publicly</h2></div>
+    <div class="form-grid">
+      <% [
+        ['show_email','Show email in the sidebar'],
+        ['show_phone','Show phone in the sidebar'],
+        ['show_birthday','Show birthday in the sidebar'],
+        ['show_location','Show location in the sidebar'],
+      ].forEach(function (pair) { %>
+        <div class="form-check">
+          <input type="checkbox" id="<%= pair[0] %>" name="<%= pair[0] %>" <%= profile[pair[0]] ? 'checked' : '' %>>
+          <label for="<%= pair[0] %>"><%= pair[1] %></label>
+        </div>
+      <% }); %>
+    </div>
+    <p class="form-hint u-mt-8">
+      Your phone number and birthday are currently public on the live site. Untick these
+      if you would rather they were not.
+    </p>
+  </section>
+
+  <section class="card u-mt-24">
+    <div class="card-header"><h2 class="card-title">Availability &amp; resume</h2></div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label class="form-label" for="availability">Availability</label>
+        <input type="text" id="availability" name="availability" value="<%= profile.availability || '' %>" class="form-input">
+        <p class="form-hint">e.g. "Open to internships".</p>
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="current_status">Current status</label>
+        <input type="text" id="current_status" name="current_status" value="<%= profile.current_status || '' %>" class="form-input">
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="years_experience">Years of experience</label>
+        <input type="number" step="0.5" id="years_experience" name="years_experience"
+               value="<%= profile.years_experience || '' %>" class="form-input">
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">Resume file</label>
+        <div class="media-field" data-media-field>
+          <input type="hidden" name="resume_media_id" value="<%= profile.resume_media_id || '' %>" data-media-input>
+          <div class="media-preview" data-media-preview>
+            <% if (profile.resume_media_id) { %>
+              <span class="media-placeholder"><ion-icon name="document-text-outline"></ion-icon></span>
+            <% } else { %>
+              <span class="media-placeholder"><ion-icon name="cloud-upload-outline"></ion-icon></span>
+            <% } %>
+          </div>
+          <div class="u-flex u-gap-8">
+            <button type="button" class="btn btn-sm" data-media-pick data-accept="document">
+              <ion-icon name="document-attach-outline"></ion-icon><span>Choose PDF</span>
+            </button>
+            <button type="button" class="btn btn-sm btn-ghost" data-media-clear <%= profile.resume_media_id ? '' : 'hidden' %>>
+              <ion-icon name="close-outline"></ion-icon><span>Remove</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label" for="resume_label">Download button label</label>
+        <input type="text" id="resume_label" name="resume_label" value="<%= profile.resume_label || 'Download Resume' %>" class="form-input">
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="resume_version">Resume version</label>
+        <input type="text" id="resume_version" name="resume_version" value="<%= profile.resume_version || '' %>" class="form-input">
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="resume_updated_at">Resume updated</label>
+        <input type="date" id="resume_updated_at" name="resume_updated_at"
+               value="<%= profile.resume_updated_at ? String(profile.resume_updated_at).slice(0,10) : '' %>" class="form-input">
+      </div>
+    </div>
+
+    <% if (profile.resume_downloads) { %>
+      <p class="form-hint u-mt-16">
+        Downloaded <%= h.formatNumber(profile.resume_downloads) %> time<%= profile.resume_downloads === 1 ? '' : 's' %>.
+      </p>
+    <% } %>
+  </section>
+
+  <div class="u-flex u-gap-12 u-mt-24">
+    <button type="submit" class="btn btn-primary">
+      <ion-icon name="save-outline"></ion-icon><span>Save profile</span>
+    </button>
+    <a href="<%= siteUrl %>" target="_blank" rel="noopener" class="btn">
+      <ion-icon name="open-outline"></ion-icon><span>Preview site</span>
+    </a>
+  </div>
+</form>
+
+<%- include('../partials/admin/media-picker') %>
+<%- include('../partials/admin/foot') %>

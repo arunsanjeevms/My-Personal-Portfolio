@@ -1,0 +1,185 @@
+<%- include('../partials/admin/head') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Domains &amp; SSL</h1>
+    <p class="page-subtitle">Track registration and certificate expiry before they catch you out.</p>
+  </div>
+</div>
+
+<div class="alert alert-info">
+  <ion-icon name="information-circle-outline"></ion-icon>
+  <div class="alert-body">
+    <div class="alert-title">This is a tracker, not registrar control</div>
+    Renewing a domain, changing nameservers or issuing a certificate has to happen with your
+    registrar or host — no web app can do that without an API integration.
+    What this page <em>can</em> do for real is <strong>read the live SSL certificate</strong> over
+    a TLS connection, so the certificate dates here are verified rather than typed in.
+    Registration dates are whatever you record.
+  </div>
+</div>
+
+<% if (domains.length) { %>
+  <div class="grid grid-2">
+    <% domains.forEach(function (domain) { %>
+      <section class="card domain-card">
+        <div class="u-flex u-items-center u-gap-12">
+          <div style="min-width:0">
+            <p class="domain-name"><%= domain.domain %></p>
+            <p class="u-small u-muted">
+              <%= domain.registrar || 'Registrar not recorded' %>
+              <% if (domain.environment !== 'production') { %> · <%= domain.environment %><% } %>
+            </p>
+          </div>
+          <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+            <% if (domain.is_primary) { %><span class="badge badge-accent">primary</span><% } %>
+            <% if (!domain.is_active) { %><span class="badge">inactive</span><% } %>
+          </div>
+        </div>
+
+        <%# ---- registration ---- %>
+        <div>
+          <div class="u-flex u-justify-between u-small">
+            <span class="u-muted">Registration</span>
+            <span>
+              <% if (domain.domainDays === null) { %>
+                <span class="u-muted">no expiry date recorded</span>
+              <% } else if (domain.domainDays < 0) { %>
+                <span style="color:var(--admin-danger)">expired <%= Math.abs(domain.domainDays) %> days ago</span>
+              <% } else { %>
+                <strong style="color:<%= domain.domainLevel === 'critical' ? 'var(--admin-danger)'
+                  : domain.domainLevel === 'warning' ? 'var(--admin-warning)' : 'var(--white-2)' %>">
+                  <%= domain.domainDays %> days left
+                </strong>
+              <% } %>
+            </span>
+          </div>
+          <div class="expiry-meter">
+            <% [90, 60, 30, 14, 7, 1].forEach(function (threshold) {
+                 const passed = domain.domainDays !== null && domain.domainDays <= threshold;
+                 const cls = domain.domainDays === null ? ''
+                   : !passed ? 'is-on'
+                   : threshold <= 7 ? 'is-crit' : 'is-warn'; %>
+              <span class="expiry-seg <%= cls %>" title="<%= threshold %> day warning"></span>
+            <% }); %>
+          </div>
+          <% if (domain.expires_at) { %>
+            <p class="u-small u-muted u-mt-8">
+              Expires <%= h.formatDate(domain.expires_at) %>
+              · auto-renew <%= domain.auto_renew ? 'on' : 'off' %>
+            </p>
+          <% } %>
+        </div>
+
+        <%# ---- SSL ---- %>
+        <div>
+          <div class="u-flex u-justify-between u-small">
+            <span class="u-muted">SSL certificate</span>
+            <span>
+              <span class="badge badge-<%= domain.ssl_status === 'valid' ? 'success'
+                : domain.ssl_status === 'expiring' ? 'warning'
+                : domain.ssl_status === 'expired' || domain.ssl_status === 'error' ? 'danger' : '' %>">
+                <%= domain.ssl_status %>
+              </span>
+            </span>
+          </div>
+          <% if (domain.ssl_expires_at) { %>
+            <p class="u-small u-muted u-mt-8">
+              <%= domain.ssl_issuer || 'Unknown issuer' %> ·
+              expires <%= h.formatDate(domain.ssl_expires_at) %>
+              <% if (domain.sslDays !== null) { %> (<%= domain.sslDays %> days)<% } %>
+            </p>
+          <% } %>
+          <% if (domain.ssl_last_checked_at) { %>
+            <p class="u-small u-muted">Last checked <%= h.timeAgo(domain.ssl_last_checked_at) %></p>
+          <% } else { %>
+            <p class="u-small u-muted">Never checked</p>
+          <% } %>
+        </div>
+
+        <% if (domain.server_ip || domain.hosting_provider || domain.dns_provider) { %>
+          <div class="detail-list">
+            <% if (domain.hosting_provider) { %>
+              <div class="detail-row"><span class="detail-label">Hosting</span><span class="detail-value"><%= domain.hosting_provider %></span></div>
+            <% } %>
+            <% if (domain.dns_provider) { %>
+              <div class="detail-row"><span class="detail-label">DNS</span><span class="detail-value"><%= domain.dns_provider %></span></div>
+            <% } %>
+            <% if (domain.server_ip) { %>
+              <div class="detail-row"><span class="detail-label">Server IP</span><span class="detail-value u-mono"><%= domain.server_ip %></span></div>
+            <% } %>
+          </div>
+        <% } %>
+
+        <div class="u-flex u-gap-8" style="flex-wrap:wrap">
+          <form method="POST" action="<%= adminPath %>/domain/<%= domain.id %>/check" style="display:inline">
+            <%- csrfField() %>
+            <button type="submit" class="btn btn-sm">
+              <ion-icon name="shield-checkmark-outline"></ion-icon><span>Check SSL now</span>
+            </button>
+          </form>
+          <button type="button" class="btn btn-sm" data-edit-domain="<%= domain.id %>">
+            <ion-icon name="create-outline"></ion-icon><span>Edit</span>
+          </button>
+          <form method="POST" action="<%= adminPath %>/domain/<%= domain.id %>/delete" style="display:inline">
+            <%- csrfField() %>
+            <button type="submit" class="btn btn-sm btn-danger"
+                    data-confirm="This only removes &quot;<%= domain.domain %>&quot; from the tracker. The domain registration itself is not affected in any way."
+                    data-confirm-title="Stop tracking this domain?" data-confirm-action="Stop tracking">
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
+          </form>
+        </div>
+
+        <%# Inline edit form, hidden until Edit is clicked. %>
+        <form method="POST" action="<%= adminPath %>/domain/<%= domain.id %>"
+              id="edit-domain-<%= domain.id %>" class="u-hidden" data-guard>
+          <%- csrfField() %>
+          <%- include('../partials/admin/domain-fields', { domain: domain }) %>
+          <div class="u-flex u-gap-8 u-mt-16">
+            <button type="submit" class="btn btn-primary btn-sm">
+              <ion-icon name="save-outline"></ion-icon><span>Save</span>
+            </button>
+            <button type="button" class="btn btn-sm" data-cancel-domain="<%= domain.id %>">Cancel</button>
+          </div>
+        </form>
+      </section>
+    <% }); %>
+  </div>
+<% } %>
+
+<section class="card u-mt-24">
+  <div class="card-header">
+    <h2 class="card-title"><%= domains.length ? 'Track another domain' : 'Track your first domain' %></h2>
+  </div>
+
+  <form method="POST" action="<%= adminPath %>/domain" data-guard>
+    <%- csrfField() %>
+    <%- include('../partials/admin/domain-fields', { domain: {
+      domain: '', registrar: '', registrar_url: '', purchased_at: null, registered_at: null,
+      expires_at: null, auto_renew: 1, nameservers: '', dns_provider: '', ssl_enabled: 1,
+      ssl_expires_at: null, hosting_provider: '', server_ip: '', environment: 'production',
+      is_primary: domains.length === 0 ? 1 : 0, is_active: 1, notes: ''
+    } }) %>
+
+    <button type="submit" class="btn btn-primary u-mt-16">
+      <ion-icon name="add-outline"></ion-icon><span>Add domain</span>
+    </button>
+  </form>
+</section>
+
+<script>
+  // Toggles the inline edit forms.
+  document.querySelectorAll('[data-edit-domain]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      document.getElementById('edit-domain-' + button.dataset.editDomain).classList.toggle('u-hidden');
+    });
+  });
+  document.querySelectorAll('[data-cancel-domain]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      document.getElementById('edit-domain-' + button.dataset.cancelDomain).classList.add('u-hidden');
+    });
+  });
+</script>
+
+<%- include('../partials/admin/foot') %>

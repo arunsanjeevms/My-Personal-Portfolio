@@ -1,0 +1,248 @@
+/*-----------------------------------*\
+  Admin components added in phases 4-6
+  (settings, theme, analytics, inbox, domains)
+
+  Split from admin.css purely to keep each file readable; both are
+  loaded together and share the same custom properties.
+\*-----------------------------------*/
+
+/*-----------------------------------*\
+  settings
+\*-----------------------------------*/
+
+.settings-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.settings-tabs {
+  position: sticky;
+  top: calc(var(--topbar-height) + 20px);
+  background: var(--eerie-black-2);
+  border: 1px solid var(--jet);
+  border-radius: var(--radius);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 11px;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-7);
+  color: var(--light-gray);
+  transition: var(--transition-1);
+}
+.settings-tab:hover { background: var(--onyx); color: var(--white-2); }
+.settings-tab.is-active {
+  background: var(--onyx);
+  color: var(--orange-yellow-crayola);
+  font-weight: var(--fw-500);
+}
+.settings-tab .nav-badge { margin-left: auto; }
+
+.settings-results {
+  margin-top: 12px;
+  border-top: 1px solid var(--jet);
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.settings-result {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-7);
+  color: var(--light-gray);
+  transition: var(--transition-1);
+}
+.settings-result:hover { background: var(--onyx); color: var(--white-2); }
+.settings-result .group { margin-left: auto; font-size: var(--fs-8); color: var(--light-gray-70); }
+
+.setting-row.is-highlighted {
+  outline: 2px solid var(--orange-yellow-crayola);
+  outline-offset: 6px;
+  border-radius: var(--radius-sm);
+}
+
+.theme-swatch {
+  width: 38px; height: 38px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--jet);
+}
+
+.char-counter { font-size: var(--fs-8); color: var(--light-gray-70); margin-top: 5px; }
+.char-counter.is-over { color: var(--admin-warning); }
+
+/*-----------------------------------*\
+  analytics
+\*-----------------------------------*/
+
+.chart-card { position: relative; }
+.chart-wrap { position: relative; height: 260px; }
+
+.bar-list { display: flex; flex-direction: column; gap: 11px; }
+
+.bar-row { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; font-size: var(--fs-7); }
+.bar-label { color: var(--light-gray); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-value { color: var(--white-2); font-weight: var(--fw-500); }
+.bar-track {
+  grid-column: 1 / -1;
+  height: 5px;
+  border-radius: 5px;
+  background: var(--jet);
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  background: var(--text-gradient-yellow);
+  transition: width 0.4s ease;
+}
+
+.live-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--admin-success);
+  display: inline-block;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 hsla(145, 55%, 48%, 0.5); }
+  50% { box-shadow: 0 0 0 6px hsla(145, 55%, 48%, 0); }
+}
+
+.range-picker { display: flex; gap: 4px; }
+.range-picker a {
+  padding: 5px 11px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--jet);
+  font-size: var(--fs-8);
+  color: var(--light-gray);
+  transition: var(--transition-1);
+}
+.range-picker a:hover { border-color: var(--vegas-gold); }
+.range-picker a.is-active {
+  background: var(--orange-yellow-crayola);
+  color: var(--smoky-black);
+  border-color: transparent;
+  font-weight: var(--fw-500);
+}
+
+/*-----------------------------------*\
+  inbox
+\*-----------------------------------*/
+
+.message-row { cursor: pointer; }
+.message-row.is-unread { background: hsla(45, 100%, 72%, 0.04); }
+.message-row.is-unread .cell-strong { color: var(--orange-yellow-crayola); }
+
+.message-body {
+  background: var(--eerie-black-1);
+  border: 1px solid var(--jet);
+  border-radius: var(--radius-sm);
+  padding: 18px;
+  font-size: var(--fs-6);
+  line-height: 1.75;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--light-gray);
+}
+
+.status-pill { display: inline-flex; align-items: center; gap: 5px; }
+
+/*-----------------------------------*\
+  domains
+\*-----------------------------------*/
+
+.expiry-meter { display: flex; gap: 3px; margin-top: 8px; }
+.expiry-seg { flex: 1; height: 4px; border-radius: 4px; background: var(--jet); }
+.expiry-seg.is-on { background: var(--admin-success); }
+.expiry-seg.is-warn { background: var(--admin-warning); }
+.expiry-seg.is-crit { background: var(--admin-danger); }
+
+.domain-card { display: flex; flex-direction: column; gap: 14px; }
+.domain-name {
+  font-size: var(--fs-3);
+  color: var(--white-1);
+  font-weight: var(--fw-500);
+  word-break: break-all;
+}
+
+/*-----------------------------------*\
+  logs
+\*-----------------------------------*/
+
+.log-diff {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 10px;
+}
+.log-diff pre {
+  background: var(--smoky-black);
+  border: 1px solid var(--jet);
+  border-radius: var(--radius-sm);
+  padding: 11px;
+  font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+  font-size: var(--fs-8);
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+}
+.log-diff .before { color: hsl(0, 55%, 68%); }
+.log-diff .after { color: hsl(145, 45%, 62%); }
+
+details.log-entry summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 4px 0;
+  color: var(--light-gray-70);
+  font-size: var(--fs-8);
+}
+details.log-entry summary::-webkit-details-marker { display: none; }
+details.log-entry summary:hover { color: var(--orange-yellow-crayola); }
+
+/*-----------------------------------*\
+  danger zone
+\*-----------------------------------*/
+
+.danger-zone {
+  border-color: hsla(0, 65%, 58%, 0.4);
+  background: linear-gradient(to bottom right, hsla(0, 65%, 58%, 0.05), transparent 60%), var(--eerie-black-2);
+}
+.danger-zone .card-title { color: var(--admin-danger); }
+
+.code-editor {
+  font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+  font-size: var(--fs-8);
+  line-height: 1.65;
+  tab-size: 2;
+  min-height: 180px;
+}
+
+/*-----------------------------------*\
+  responsive
+\*-----------------------------------*/
+
+@media (max-width: 900px) {
+  .settings-layout { grid-template-columns: 1fr; }
+  .settings-tabs {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 6px;
+  }
+  .settings-tab { white-space: nowrap; }
+  .settings-tab .nav-badge { display: none; }
+  .log-diff { grid-template-columns: 1fr; }
+}
