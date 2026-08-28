@@ -1021,16 +1021,17 @@ main {
 .service-list {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
+  gap: 16px;
 }
 
 .service-item {
   position: relative;
   background: var(--border-gradient-onyx);
-  padding: 20px;
-  border-radius: 14px;
+  padding: 22px 20px;
+  border-radius: 16px;
   box-shadow: var(--shadow-2);
   z-index: 1;
+  transition: transform var(--transition-1), box-shadow var(--transition-1);
 }
 
 .service-item::before {
@@ -1042,20 +1043,54 @@ main {
   z-index: -1;
 }
 
-.service-icon-box { margin-bottom: 10px; }
+.service-item:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-3);
+}
 
-.service-icon-box img,
-.arunicon ion-icon { margin: auto; }
+.service .service-icon-box,
+.service .arunicon {
+  width: 48px;
+  height: 48px;
+  margin-inline: auto;
+  margin-bottom: 14px;
+  border-radius: 14px;
+  background: hsla(45, 100%, 72%, 0.1);
+  border: 1px solid hsla(45, 100%, 72%, 0.25);
+  transition: background var(--transition-1), border-color var(--transition-1);
+}
+
+.service-item:hover .service-icon-box,
+.service-item:hover .arunicon {
+  background: hsla(45, 100%, 72%, 0.18);
+  border-color: hsla(45, 100%, 72%, 0.45);
+}
+
+.service .service-icon-box img {
+  width: 26px;
+  height: 26px;
+  margin: auto;
+}
+
+.service .arunicon ion-icon {
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
+  margin: auto;
+}
 
 .service-content-box { text-align: center; }
 
-.service-item-title { margin-bottom: 7px; }
+.service-item-title {
+  margin-bottom: 7px;
+  color: var(--white-2);
+}
 
 .service-item-text {
-  color: var(--light-gray);
-  font-size: var(--fs-6);
-  font-weight: var(--fw-3);
-  line-height: 1.6;
+  color: var(--light-gray-70);
+  font-size: var(--fs-7);
+  font-weight: var(--fw-300);
+  line-height: 1.65;
 }
 
 
@@ -1992,13 +2027,14 @@ textarea.form-input::-webkit-resizer { display: none; }
     justify-content: flex-start;
     align-items: flex-start;
     gap: 18px;
-    padding: 30px;
+    padding: 26px;
   }
 
-  .service-icon-box,
-  .arunicon {
+  .service .service-icon-box,
+  .service .arunicon {
+    margin-inline: 0;
     margin-bottom: 0;
-    margin-top: 5px;
+    margin-top: 2px;
   }
 
   .service-content-box { text-align: left; }
@@ -2343,7 +2379,7 @@ textarea.form-input::-webkit-resizer { display: none; }
 
   .service-list {
     grid-template-columns: 1fr 1fr;
-    gap: 20px 25px;
+    gap: 18px 20px;
   }
 
   /* testimonials */
@@ -2696,11 +2732,28 @@ textarea.form-input::-webkit-resizer { display: none; }
   .service .service-item-text {
     display: none;
   }
+
+  .service .service-list.service-marquee-active .service-item:hover {
+    transform: none;
+    box-shadow: var(--shadow-2);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .service .service-list.service-marquee-active {
     animation: none !important;
+    transform: none !important;
+  }
+
+  .service-item,
+  .about-signal,
+  .about-highlight {
+    transition: none !important;
+  }
+
+  .service-item:hover,
+  .about-signal:hover,
+  .about-highlight:hover {
     transform: none !important;
   }
 }
