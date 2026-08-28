@@ -1518,6 +1518,14 @@ main {
   margin-bottom: 15px;
 }
 
+/* uniform thumbnail box that scales with the column instead of the photo */
+@supports (aspect-ratio: 16 / 10) {
+  .project-img {
+    height: auto;
+    aspect-ratio: 16 / 10;
+  }
+}
+
 .project-img::before {
   content: "";
   position: absolute;
@@ -1830,12 +1838,6 @@ textarea.form-input::-webkit-resizer { display: none; }
   .clients-item { min-width: calc(33.33% - 10px); }
 
 
-
-  /**
-   * #PORTFOLIO, BLOG 
-   */
-
-  .project-img { height: auto; }
 
 }
 
