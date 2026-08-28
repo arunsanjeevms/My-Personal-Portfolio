@@ -405,12 +405,35 @@ article.active .about-highlight:nth-child(3) { animation-delay: 0.42s; }
 .resume-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 15px 24px;
   margin-bottom: 0;
   padding-top: 0;
 }
+
+/*
+ * .article-title carries a margin-bottom plus a padding-bottom that only exists
+ * to reserve room for its underline. Both inflate the flex line and push a
+ * centred button down into the gap under the heading, so keep the margin out of
+ * the line and give the button a bottom margin equal to the underline padding —
+ * that lands the button on the title text's centre line, clear of the underline.
+ */
+.resume-header .article-title {
+  margin-bottom: 0;
+  /*
+   * .h2 inherits line-height: normal, which for Poppins leaves ~13px of dead
+   * space below the caps before padding-bottom even begins. Pinning the line
+   * box makes padding-bottom the actual gap to the underline, and one value
+   * then holds at every breakpoint (it outranks the 7/15/20px .article-title
+   * rules on specificity).
+   */
+  line-height: 1.1;
+  padding-bottom: 13px;
+}
+
+/* mirrors the title's padding-bottom so the button stays centred on the text */
+.resume-header .download-resume-btn { margin-bottom: 13px; }
 
 .download-resume-btn {
   display: inline-flex;
@@ -491,7 +514,7 @@ article.active .about-highlight:nth-child(3) { animation-delay: 0.42s; }
 @media (min-width: 1024px) {
   .resume-section-header {
     margin-top: 0; /* Remove extra top margin */
-    margin-bottom: 40px;
+    margin-bottom: 80px; /* holds EDUCATION in place as the header block tightened */
     padding-top: 60px; /* Use padding instead to push content down from navbar */
   }
   
@@ -514,10 +537,10 @@ article.active .about-highlight:nth-child(3) { animation-delay: 0.42s; }
 @media (max-width: 1023px) and (min-width: 769px) {
   .resume-section-header {
     margin-top: 0;
-    margin-bottom: 35px;
+    margin-bottom: 75px; /* holds EDUCATION in place as the header block tightened */
     padding-top: 20px;
   }
-  
+
   .resume-header {
     gap: 25px;
   }
@@ -539,7 +562,12 @@ article.active .about-highlight:nth-child(3) { animation-delay: 0.42s; }
   .resume-header .article-title {
     margin-bottom: 0;
   }
-  
+
+  /* stacked, so the underline-matching offset is no longer wanted */
+  .resume-header .download-resume-btn {
+    margin-bottom: 0;
+  }
+
   .download-resume-btn {
     padding: 10px 14px;
     font-size: var(--fs-7);
