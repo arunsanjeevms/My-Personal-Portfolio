@@ -1304,6 +1304,26 @@ main {
   line-height: 1.6;
 }
 
+.cert-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: var(--fw-600);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: hsl(45, 100%, 72%);
+  background: hsla(45, 100%, 72%, 0.12);
+  border: 1px solid hsla(45, 100%, 72%, 0.4);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.cert-badge ion-icon { font-size: 11px; }
+
 .timeline-item:not(:last-child)::before {
   content: "";
   position: absolute;
