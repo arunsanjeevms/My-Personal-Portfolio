@@ -1,3 +1,7 @@
+# https://arunsanjeev.dev/ - portfolio of M S Arun Sanjeev (Arun Sanjeev)
+# Everything published here is public. CSS, JavaScript, fonts and images are
+# intentionally crawlable so search engines can render the page correctly.
+
 User-agent: *
 Allow: /
 

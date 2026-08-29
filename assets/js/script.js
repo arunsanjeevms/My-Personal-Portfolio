@@ -12,46 +12,7 @@ const sidebar = document.querySelector("[data-sidebar]");
 const sidebarBtn = document.querySelector("[data-sidebar-btn]");
 
 // sidebar toggle functionality for mobile
-sidebarBtn.addEventListener("click", function () { elementToggleFunc(sidebar); });
-
-
-
-// testimonials variables
-const testimonialsItem = document.querySelectorAll("[data-testimonials-item]");
-const modalContainer = document.querySelector("[data-modal-container]");
-const modalCloseBtn = document.querySelector("[data-modal-close-btn]");
-const overlay = document.querySelector("[data-overlay]");
-
-// modal variable
-const modalImg = document.querySelector("[data-modal-img]");
-const modalTitle = document.querySelector("[data-modal-title]");
-const modalText = document.querySelector("[data-modal-text]");
-
-// modal toggle function
-const testimonialsModalFunc = function () {
-  modalContainer.classList.toggle("active");
-  overlay.classList.toggle("active");
-}
-
-// add click event to all modal items
-for (let i = 0; i < testimonialsItem.length; i++) {
-
-  testimonialsItem[i].addEventListener("click", function () {
-
-    modalImg.src = this.querySelector("[data-testimonials-avatar]").src;
-    modalImg.alt = this.querySelector("[data-testimonials-avatar]").alt;
-    modalTitle.innerHTML = this.querySelector("[data-testimonials-title]").innerHTML;
-    modalText.innerHTML = this.querySelector("[data-testimonials-text]").innerHTML;
-
-    testimonialsModalFunc();
-
-  });
-
-}
-
-// add click event to modal close button
-modalCloseBtn.addEventListener("click", testimonialsModalFunc);
-overlay.addEventListener("click", testimonialsModalFunc);
+if (sidebarBtn) sidebarBtn.addEventListener("click", function () { elementToggleFunc(sidebar); });
 
 
 
@@ -61,7 +22,7 @@ const selectItems = document.querySelectorAll("[data-select-item]");
 const selectValue = document.querySelector("[data-selecct-value]");
 const filterBtn = document.querySelectorAll("[data-filter-btn]");
 
-select.addEventListener("click", function () { elementToggleFunc(this); });
+if (select) select.addEventListener("click", function () { elementToggleFunc(this); });
 
 // add event in all select items
 for (let i = 0; i < selectItems.length; i++) {
@@ -125,6 +86,8 @@ for (let i = 0; i < formInputs.length; i++) {
   formInputs[i].addEventListener("input", function () {
 
     // check form validation
+    if (!form) return;
+
     if (form.checkValidity()) {
       formBtn.removeAttribute("disabled");
     } else {
@@ -415,20 +378,94 @@ setupLazyReveal(".blog[data-page='blog']", ".blog-post-item", true);
 const navigationLinks = document.querySelectorAll("[data-nav-link]");
 const pages = document.querySelectorAll("[data-page]");
 
+// activate one top-level page and sync the navbar state
+const showPage = function (pageName) {
+  let matched = false;
+
+  for (let i = 0; i < pages.length; i++) {
+    const isTarget = pages[i].dataset.page === pageName;
+    pages[i].classList.toggle("active", isTarget);
+    if (isTarget) matched = true;
+  }
+
+  if (!matched) return false;
+
+  for (let i = 0; i < navigationLinks.length; i++) {
+    const isTarget = navigationLinks[i].textContent.trim().toLowerCase() === pageName;
+    navigationLinks[i].classList.toggle("active", isTarget);
+
+    if (isTarget) {
+      navigationLinks[i].setAttribute("aria-current", "page");
+    } else {
+      navigationLinks[i].removeAttribute("aria-current");
+    }
+  }
+
+  return true;
+}
+
+// resolve a fragment to either a page ("projects") or a section inside one ("certifications")
+const openTarget = function (targetId) {
+  if (!targetId) return false;
+
+  if (showPage(targetId)) {
+    window.scrollTo(0, 0);
+    return true;
+  }
+
+  const section = document.getElementById(targetId);
+  if (!section) return false;
+
+  const parentPage = section.closest("[data-page]");
+  if (parentPage) showPage(parentPage.dataset.page);
+
+  requestAnimationFrame(function () { section.scrollIntoView({ block: "start" }); });
+
+  return true;
+}
+
+const updateHash = function (targetId) {
+  if (window.history && typeof history.pushState === "function") {
+    history.pushState(null, "", "#" + targetId);
+  } else {
+    window.location.hash = targetId;
+  }
+}
+
 // add event to all nav link
 for (let i = 0; i < navigationLinks.length; i++) {
-  navigationLinks[i].addEventListener("click", function () {
+  navigationLinks[i].addEventListener("click", function (event) {
+    const pageName = this.textContent.trim().toLowerCase();
+    if (!showPage(pageName)) return;
 
-    for (let i = 0; i < pages.length; i++) {
-      if (this.innerHTML.toLowerCase() === pages[i].dataset.page) {
-        pages[i].classList.add("active");
-        navigationLinks[i].classList.add("active");
-        window.scrollTo(0, 0);
-      } else {
-        pages[i].classList.remove("active");
-        navigationLinks[i].classList.remove("active");
-      }
-    }
-
+    event.preventDefault();
+    window.scrollTo(0, 0);
+    updateHash(pageName);
   });
 }
+
+// in-page links (About -> Projects, Experience, Certifications, ...)
+const inPageLinks = document.querySelectorAll("a[href^='#']:not([data-nav-link])");
+
+for (let i = 0; i < inPageLinks.length; i++) {
+  inPageLinks[i].addEventListener("click", function (event) {
+    const targetId = (this.getAttribute("href") || "").slice(1);
+    if (!targetId) return;
+
+    if (openTarget(targetId)) {
+      event.preventDefault();
+      updateHash(targetId);
+    }
+  });
+}
+
+// deep links such as https://arunsanjeev.dev/#projects
+const openFromHash = function () {
+  const targetId = decodeURIComponent(window.location.hash.replace("#", "")).trim();
+  if (targetId) openTarget(targetId);
+}
+
+window.addEventListener("hashchange", openFromHash);
+window.addEventListener("popstate", openFromHash);
+
+openFromHash();
