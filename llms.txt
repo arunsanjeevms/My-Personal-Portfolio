@@ -1,0 +1,103 @@
+# M S Arun Sanjeev
+
+> Personal portfolio of M S Arun Sanjeev — also written Arun Sanjeev or ARUN SANJEEV, and known online as msarunsanjeev and arunsanjeevms. A Software Developer and Full Stack Developer based in Namakkal, Tamil Nadu, India, working across full stack development, cloud deployment, cyber security and Generative AI. Final-year Computer Science and Engineering student at M. Kumarasamy College of Engineering, Karur.
+
+The site is a single page at https://arunsanjeev.dev/. Sections are tabs on that
+page and are addressable by URL fragment; every fragment below is a stable,
+linkable location. All section content is present in the initial HTML response,
+so no JavaScript execution is required to read it. Only the Blog tab is filled
+in at runtime from an external Medium feed.
+
+Canonical URL: https://arunsanjeev.dev/
+All other hostnames (www, http, the github.io origin) 301-redirect here.
+
+## About
+
+- [About](https://arunsanjeev.dev/#about): summary of his work, headline figures, and the four areas he works in (Fullstack Development, Cloud Deployment, Cyber Security, Artificial Intelligence).
+
+## Projects
+
+- [Projects](https://arunsanjeev.dev/#projects): 34 projects, filterable by Cyber Security, Applications, Web development and AI Projects.
+
+- [My Portfolio Site V2](https://arunsanjeev.dev/) — Web development
+- ZionHR — Applications - HR & Recruitment Platform (Live)
+- [PlacementOS](https://github.com/arunsanjeevms/PlacementOS) — Applications - React 19, Node & MongoDB
+- [Quotiva (InvoQuo)](https://github.com/arunsanjeevms/Quotiva) — Applications - Multi-tenant Invoicing SaaS
+- [Smart-Aid (MediConnect)](https://github.com/arunsanjeevms/MediConnect-Bengaluru-GDG) — AI Projects - Flutter & FastAPI (GDG Bengaluru)
+- [MicroCollect](https://github.com/arunsanjeevms/Micro-Collect) — Applications - Flutter, Node & MySQL
+- [Synalyze](https://github.com/arunsanjeevms/Synalyze) — AI Projects - ML Bug Detection API
+- [Smart CCTV Fight Detection](https://github.com/arunsanjeevms/cctv-fight-detection) — AI Projects - YOLOv8 & OpenCV
+- [Auction Platform](https://github.com/arunsanjeevms/Auction-Platform) — Web development - Real-time Node & React
+- [PDF Quiz Trainer](https://github.com/arunsanjeevms/Quiz-Platform) — Web development - React & TypeScript
+- [VoteGuard](https://github.com/arunsanjeevms/voteguard) — Cyber Security - IoT E-Voting System
+- [CableNex](https://github.com/arunsanjeevms/CableNex) — Applications - PHP & MySQL Billing
+- [Aaroh - Hackathon Site](https://github.com/arunsanjeevms/multiverse) — Web development - React 19 & Three.js
+- [Stranger Thinks](https://github.com/arunsanjeevms/social-networking-site) — Web development - Social Network (PHP, NFC)
+- [SanCleaner](https://github.com/arunsanjeevms/SanCleaner-Duplicates-Remover) — Applications - Python Desktop Tool (Shipped)
+- [MKCE KR Connect](https://github.com/arunsanjeevms/mkce-krconnect) — Applications - Faculty Records Portal
+- [MKCE Clubs Portal](https://github.com/arunsanjeevms/mkce-clubs) — Web development - HTML, CSS & JS
+- [Natril Naturals](https://github.com/arunsanjeevms/Natril-Naturals) — Web development - Brand Website
+- [Bus Reservation System](https://github.com/arunsanjeevms/Bus_Reservation_System) — Applications - HTML, CSS, PHP (DBMS Project)
+- [College Management System](https://github.com/arunsanjeevms/College-Management-System) — Applications - Java
+- [PDF Password Bruteforce Tool](https://github.com/arunsanjeevms/PDF-Bruteforce) — Cyber Security
+- [Telegram Bot](https://github.com/arunsanjeevms/Telegrambot_Python) — Cyber Security
+- [Compound Interest Calculator](https://github.com/arunsanjeevms/Compound-Interest-Calculator-with-Graph) — Web development
+- [SENSAN Website](https://arunsanjeevms.github.io/SENSAN/) — Web development
+- [Thiran Link](https://arunsanjeevms.github.io/ThiranLink/) — Web development
+- [Digispark Scripts](https://github.com/arunsanjeevms/Digispark-Scripts) — Cyber Security
+- [AI-Based-Rain-Alert-for-MKCE](https://github.com/arunsanjeevms/AI-Based-Rain-Alert-for-MKCE) — AI Projects
+- [RAG-LLM](https://github.com/arunsanjeevms/RAG-LLM) — AI Projects
+- Trust Trade — AI Projects
+- Life Link — AI Projects
+- Hostel Management System — Applications - Full Stack (Live, 1K+ Users)
+- Credixia - Finance Management App — Applications - Full Stack (Live)
+- digsafe - IoT — Applications - IoT
+- [GPA Calculator Web Browser Extension](https://microsoftedge.microsoft.com/addons) — Applications - Launched in Microsoft Store
+
+## Experience
+
+- [Experience](https://arunsanjeev.dev/#experience): 14 roles, including Co-founder & Software Developer at Triospark IT Solutions, Associate Student Ambassador at Microsoft, Vice Chair of the IEEE Systems, Man, and Cybernetics Society, Microsoft Learn Student Ambassador (Beta and Alpha), and member of the Technical Innovation Hub.
+
+## Education
+
+- [Education](https://arunsanjeev.dev/#education): M Kumarasamy College of Engineering, Karur — Bachelor of Engineering in Computer Science and Engineering, 2023-2027.
+
+## Skills
+
+- [Core Expertise](https://arunsanjeev.dev/#skills): Fullstack Development (Frontend + Backend), Cloud Deployment & DevOps, Cyber Security & VAPT, Artificial Intelligence Integration, Hackathon Execution & Team Leadership.
+
+## Certifications
+
+- [Certifications](https://arunsanjeev.dev/#certifications): 17 certifications, including Microsoft Certified: Azure Fundamentals, GitHub Foundations, Postman API Fundamentals Student Expert, Google Cybersecurity Specialization, CISCO Junior Cybersecurity Analyst Path, IBM Enterprise Design Thinking (Practitioner and Co-Creator), and four NPTEL courses.
+
+## Achievements
+
+- [Achievements](https://arunsanjeev.dev/#achievements): 11 awards, including wins at Hexaware AI Innovation League (HAIL 2026), AI Ascend 2026 (AWS & Kyndryl), Prathiyogitha Volume 2, GenCraft 2026 Hackathon and Appathon, and runner-up at MKCE HackFest 2026.
+
+## Publications
+
+- [Publications](https://arunsanjeev.dev/#publications): DIGSAFE: 5G-Based Smart Helmet for Proactive Worker Safety using XAI — IEEE ICCTAC 2026, IEEE Xplore ID 11524539.
+
+## Blog
+
+- [Blog](https://arunsanjeev.dev/#blog): latest posts, loaded from his Medium profile at https://medium.com/@msarunsanjeev
+
+## Contact
+
+- [Contact](https://arunsanjeev.dev/#contact): contact form. Email msarunsanjeev@gmail.com. Located in Namakkal, Tamil Nadu, India.
+
+## Profiles
+
+The following accounts belong to the same person and are declared as `sameAs`
+in the Person JSON-LD on the homepage.
+
+- [GitHub — arunsanjeevms](https://github.com/arunsanjeevms)
+- [LinkedIn — arunsanjeev](https://www.linkedin.com/in/arunsanjeev/)
+- [Medium — @msarunsanjeev](https://medium.com/@msarunsanjeev)
+- [Instagram — arun_sanjeev._](https://www.instagram.com/arun_sanjeev._/)
+
+## Optional
+
+- [Resume (PDF)](https://arunsanjeev.dev/assets/RESUME.pdf): full curriculum vitae.
+- [Sitemap](https://arunsanjeev.dev/sitemap.xml)
+- [robots.txt](https://arunsanjeev.dev/robots.txt)
