@@ -1,8 +1,48 @@
 # https://arunsanjeev.dev/ - portfolio of M S Arun Sanjeev (Arun Sanjeev)
-# Everything published here is public. CSS, JavaScript, fonts and images are
-# intentionally crawlable so search engines can render the page correctly.
+#
+# Policy: this is a public personal portfolio. Everything published here is
+# meant to be read, indexed and cited. Nothing on this host is private, so
+# nothing is disallowed. CSS, JavaScript, fonts and images are intentionally
+# crawlable so the page can be rendered and understood correctly.
+#
+# The wildcard rule below already grants access to every crawler. The named
+# groups that follow do not change what is permitted - they exist to state the
+# policy explicitly for the search and AI crawlers that identify themselves,
+# so there is no ambiguity about whether this site opts out.
+#
+# Note: robots.txt only controls crawler access. It does not guarantee
+# indexing, retrieval, or inclusion in any search result or AI answer.
+#
+# Machine-readable site guide: https://arunsanjeev.dev/llms.txt
 
 User-agent: *
+Allow: /
+
+# Search engine crawlers
+User-agent: Googlebot
+User-agent: Googlebot-Image
+User-agent: Bingbot
+User-agent: DuckDuckBot
+User-agent: Applebot
+Allow: /
+
+# AI answer engines and user-initiated assistant retrieval
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: Claude-User
+User-agent: Claude-SearchBot
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+Allow: /
+
+# AI grounding and model crawlers
+User-agent: Google-Extended
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: Applebot-Extended
+User-agent: meta-externalagent
+User-agent: Amazonbot
+User-agent: CCBot
 Allow: /
 
 Sitemap: https://arunsanjeev.dev/sitemap.xml
