@@ -1,6 +1,6 @@
 # M S Arun Sanjeev
 
-> Personal portfolio of M S Arun Sanjeev — also written Arun Sanjeev or ARUN SANJEEV, and known online as msarunsanjeev and arunsanjeevms. A Software Developer and Full Stack Developer based in Namakkal, Tamil Nadu, India, working across full stack development, cloud deployment, cyber security and Generative AI. Final-year Computer Science and Engineering student at M. Kumarasamy College of Engineering, Karur.
+> Personal portfolio of M S Arun Sanjeev — also written Arun Sanjeev or ARUN SANJEEV, and known online as arunsanjeev, msarunsanjeev and arunsanjeevms. A Software Developer and Full Stack Developer based in Namakkal, Tamil Nadu, India, working across full stack development, cloud deployment, cyber security and Generative AI. Final-year Computer Science and Engineering student at M. Kumarasamy College of Engineering, Karur. In 2026 he is an Associate Student Ambassador at Microsoft, a Core Team Member of the AWS Student Builder Group, and Vice Chair of the IEEE Systems, Man, and Cybernetics Society.
 
 The site is a single page at https://arunsanjeev.dev/. Sections are tabs on that
 page and are addressable by URL fragment; every fragment below is a stable,
