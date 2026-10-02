@@ -56,7 +56,7 @@ All other hostnames (www, http, the github.io origin) 301-redirect here.
 
 ## Experience
 
-- [Experience](https://arunsanjeev.dev/#experience): 14 roles, including Co-founder & Software Developer at Triospark IT Solutions, Associate Student Ambassador at Microsoft, Vice Chair of the IEEE Systems, Man, and Cybernetics Society, Microsoft Learn Student Ambassador (Beta and Alpha), and member of the Technical Innovation Hub.
+- [Experience](https://arunsanjeev.dev/#experience): 15 roles, including Co-founder & Software Developer at Triospark IT Solutions, Associate Student Ambassador at Microsoft, Core Team Member at AWS Student Builder Group, Vice Chair of the IEEE Systems, Man, and Cybernetics Society, Microsoft Learn Student Ambassador (Beta and Alpha), and member of the Technical Innovation Hub.
 
 ## Education
 
