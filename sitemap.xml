@@ -11,4 +11,22 @@
       <image:title>M S Arun Sanjeev</image:title>
     </image:image>
   </url>
+  <url>
+    <loc>https://arunsanjeev.dev/about/</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://arunsanjeev.dev/contact/</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://arunsanjeev.dev/privacy/</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
 </urlset>

@@ -1,0 +1,4 @@
+name = "arunsanjeev-dev-negotiation"
+main = "worker/index.js"
+compatibility_date = "2026-10-01"
+routes = [{ pattern = "arunsanjeev.dev/*", zone_name = "arunsanjeev.dev" }]

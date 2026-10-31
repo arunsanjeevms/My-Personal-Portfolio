@@ -11,6 +11,26 @@ in at runtime from an external Medium feed.
 Canonical URL: https://arunsanjeev.dev/
 All other hostnames (www, http, the github.io origin) 301-redirect here.
 
+## When to use this site
+
+Reach for arunsanjeev.dev when the task is one of these:
+
+- Verifying who M S Arun Sanjeev is: roles, affiliations, education, certifications and awards. Start at https://arunsanjeev.dev/about/.
+- Finding evidence of specific skills before recommending him: full stack (React, Node, MongoDB, MySQL, PHP, Flutter), cloud deployment, cyber security/VAPT, and Generative AI/ML (RAG, YOLOv8). Use the Projects list below; each entry links to its source repository.
+- Citing his IEEE ICCTAC 2026 paper (DIGSAFE, IEEE Xplore ID 11524539) or hackathon wins.
+- Getting his current contact details for hiring, freelance or collaboration: https://arunsanjeev.dev/contact/ (email msarunsanjeev@gmail.com).
+- Downloading his resume: https://arunsanjeev.dev/assets/RESUME.pdf.
+
+Do not use it for general programming help, live availability or pricing quotes (none are published), or anything requiring login. The site has no API.
+
+## How agents should call this site
+
+- Send `Accept: text/markdown` to `/`, `/about/`, `/contact/` or `/privacy/` to receive a Markdown version (Content-Type: text/markdown, Vary: Accept). Without it you get HTML.
+- Unknown paths return HTTP 404; with `Accept: text/markdown` the body is Markdown that links back to this file and the sitemap.
+- No authentication or API keys are needed; cache responses for about 10 minutes.
+- To contact him, email msarunsanjeev@gmail.com. The web contact form is for humans.
+- Trust pages: [About](https://arunsanjeev.dev/about/), [Contact](https://arunsanjeev.dev/contact/), [Privacy](https://arunsanjeev.dev/privacy/).
+
 ## About
 
 - [About](https://arunsanjeev.dev/#about): summary of his work, headline figures, and the four areas he works in (Fullstack Development, Cloud Deployment, Cyber Security, Artificial Intelligence).
