@@ -3,13 +3,52 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://arunsanjeev.dev/</loc>
-    <lastmod>2026-10-02</lastmod>
+    <lastmod>2026-11-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
     <image:image>
       <image:loc>https://arunsanjeev.dev/assets/images/Profile/og-card.jpg</image:loc>
       <image:title>M S Arun Sanjeev</image:title>
     </image:image>
+  </url>
+  <url>
+    <loc>https://arunsanjeev.dev/hackathons/</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://arunsanjeev.dev/assets/images/Hackathons/arun-sanjeev-hail-2026-hexaware-winner.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://arunsanjeev.dev/assets/images/Hackathons/arun-sanjeev-ai-ascend-2026-winner.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://arunsanjeev.dev/assets/images/Hackathons/arun-sanjeev-prathiyogitha-vol-2-winner.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://arunsanjeev.dev/assets/images/Hackathons/arun-sanjeev-hackprix-season-3-hyderabad.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://arunsanjeev.dev/assets/images/Hackathons/arun-sanjeev-thiran-2026-appathon-winner.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://arunsanjeev.dev/assets/images/Hackathons/arun-sanjeev-gencraft-2025-winner.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://arunsanjeev.dev/assets/images/Hackathons/arun-sanjeev-hackfest-2026-runner-up.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://arunsanjeev.dev/assets/images/Hackathons/arun-sanjeev-mkce-cse-big-win.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://arunsanjeev.dev/assets/images/Hackathons/arun-sanjeev-build-for-bangalore-gdg.webp</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://arunsanjeev.dev/experience/</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://arunsanjeev.dev/about/</loc>

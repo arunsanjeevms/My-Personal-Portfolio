@@ -10,6 +10,7 @@ const files = {
   '/': 'index.html', '/about/': 'about/index.html', '/llms.txt': 'llms.txt',
   '/index.md': 'index.md', '/404.md': '404.md', '/about.md': 'about.md',
   '/contact.md': 'contact.md', '/privacy.md': 'privacy.md',
+  '/hackathons.md': 'hackathons.md', '/experience.md': 'experience.md',
 };
 const origin = async (req) => {
   const p = new URL(req.url).pathname;
@@ -82,6 +83,44 @@ test('trust pages have >=500 characters and are in the sitemap', () => {
     assert.ok(text.trim().length >= 500, `${k} too short: ${text.trim().length}`);
     assert.ok(existsSync(new URL(`../${k}.md`, import.meta.url)));
     assert.ok(read('sitemap.xml').includes(`https://arunsanjeev.dev/${k}/`));
+  }
+});
+
+test('content pages negotiate Markdown', async () => {
+  for (const p of ['/hackathons', '/hackathons/', '/experience', '/experience/']) {
+    const r = await get(p, 'text/markdown');
+    assert.equal(r.status, 200, p);
+    assert.match(r.headers.get('content-type'), /^text\/markdown/, p);
+    assert.match(await r.text(), /^# /, p);
+  }
+});
+
+test('content pages are indexable: one h1, canonical, valid JSON-LD, sitemap, images exist', () => {
+  for (const k of ['hackathons', 'experience']) {
+    const page = read(`${k}/index.html`);
+    assert.equal((page.match(/<h1[\s>]/g) || []).length, 1, `${k}: exactly one h1`);
+    assert.ok(page.includes(`<link rel="canonical" href="https://arunsanjeev.dev/${k}/">`), `${k}: canonical`);
+
+    // measure what search engines display, i.e. with entities decoded
+    const decode = (s) => s.replace(/&(amp|quot|#x27|lt|gt);/g, (_, e) => ({ amp: '&', quot: '"', '#x27': "'", lt: '<', gt: '>' })[e]);
+    const title = decode(page.match(/<title>(.*?)<\/title>/)[1]);
+    const desc = decode(page.match(/<meta name="description" content="(.*?)">/)[1]);
+    assert.ok(title.length >= 30 && title.length <= 60, `${k}: title length ${title.length}`);
+    assert.ok(desc.length >= 120 && desc.length <= 160, `${k}: description length ${desc.length}`);
+
+    const ld = JSON.parse(page.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+    assert.equal(ld['@context'], 'https://schema.org');
+    const types = ld['@graph'].map((n) => n['@type']);
+    assert.ok(types.includes('BreadcrumbList') && types.includes('ItemList'), `${k}: ${types}`);
+
+    const text = page.split('<main>')[1].replace(/<nav[\s\S]*?<\/nav>/g, '').replace(/<[^>]+>/g, '');
+    assert.ok(text.trim().length >= 1500, `${k} too short`);
+    assert.ok(existsSync(new URL(`../${k}.md`, import.meta.url)));
+    assert.ok(read('sitemap.xml').includes(`https://arunsanjeev.dev/${k}/`));
+
+    for (const [, src] of page.matchAll(/<img src="\/([^"]+)"/g)) {
+      assert.ok(existsSync(new URL(`../${src}`, import.meta.url)), `${k}: missing ${src}`);
+    }
   }
 });
 

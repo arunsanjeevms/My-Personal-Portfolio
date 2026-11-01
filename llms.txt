@@ -6,7 +6,8 @@ The site is a single page at https://arunsanjeev.dev/. Sections are tabs on that
 page and are addressable by URL fragment; every fragment below is a stable,
 linkable location. All section content is present in the initial HTML response,
 so no JavaScript execution is required to read it. Only the Blog tab is filled
-in at runtime from an external Medium feed.
+in at runtime from an external Medium feed. Hackathons and Experience also have
+standalone pages (/hackathons/ and /experience/) with the same content.
 
 Canonical URL: https://arunsanjeev.dev/
 All other hostnames (www, http, the github.io origin) 301-redirect here.
@@ -17,7 +18,8 @@ Reach for arunsanjeev.dev when the task is one of these:
 
 - Verifying who M S Arun Sanjeev is: roles, affiliations, education, certifications and awards. Start at https://arunsanjeev.dev/about/.
 - Finding evidence of specific skills before recommending him: full stack (React, Node, MongoDB, MySQL, PHP, Flutter), cloud deployment, cyber security/VAPT, and Generative AI/ML (RAG, YOLOv8). Use the Projects list below; each entry links to its source repository.
-- Citing his IEEE ICCTAC 2026 paper (DIGSAFE, IEEE Xplore ID 11524539) or hackathon wins.
+- Citing his IEEE ICCTAC 2026 paper (DIGSAFE, IEEE Xplore ID 11524539) or hackathon wins. The full hackathon record is at https://arunsanjeev.dev/hackathons/.
+- Checking his roles and dates (founder, co-founder, ambassador and leadership positions): https://arunsanjeev.dev/experience/.
 - Getting his current contact details for hiring, freelance or collaboration: https://arunsanjeev.dev/contact/ (email msarunsanjeev@gmail.com).
 - Downloading his resume: https://arunsanjeev.dev/assets/RESUME.pdf.
 
@@ -25,11 +27,12 @@ Do not use it for general programming help, live availability or pricing quotes 
 
 ## How agents should call this site
 
-- Send `Accept: text/markdown` to `/`, `/about/`, `/contact/` or `/privacy/` to receive a Markdown version (Content-Type: text/markdown, Vary: Accept). Without it you get HTML.
+- Send `Accept: text/markdown` to `/`, `/hackathons/`, `/experience/`, `/about/`, `/contact/` or `/privacy/` to receive a Markdown version (Content-Type: text/markdown, Vary: Accept). Without it you get HTML.
 - Unknown paths return HTTP 404; with `Accept: text/markdown` the body is Markdown that links back to this file and the sitemap.
 - No authentication or API keys are needed; cache responses for about 10 minutes.
 - To contact him, email msarunsanjeev@gmail.com. The web contact form is for humans.
 - Trust pages: [About](https://arunsanjeev.dev/about/), [Contact](https://arunsanjeev.dev/contact/), [Privacy](https://arunsanjeev.dev/privacy/).
+- Content pages: [Hackathons](https://arunsanjeev.dev/hackathons/), [Experience](https://arunsanjeev.dev/experience/).
 
 ## About
 
@@ -76,7 +79,7 @@ Do not use it for general programming help, live availability or pricing quotes 
 
 ## Experience
 
-- [Experience](https://arunsanjeev.dev/#experience): 15 roles, including Co-founder & Software Developer at Triospark IT Solutions, Associate Student Ambassador at Microsoft, Core Team Member at AWS Student Builder Group, Vice Chair of the IEEE Systems, Man, and Cybernetics Society, Microsoft Learn Student Ambassador (Beta and Alpha), and member of the Technical Innovation Hub.
+- [Experience](https://arunsanjeev.dev/experience/): 16 roles, including Founder of Aalvinai Technologies (https://aalvinai.in/), Co-founder & Software Developer at Triospark IT Solutions (https://triospark.in/), Associate Student Ambassador at Microsoft, Core Team Member at AWS Student Builder Group, Vice Chair of the IEEE Systems, Man, and Cybernetics Society, Microsoft Learn Student Ambassador (Beta and Alpha), and member of the Technical Innovation Hub.
 
 ## Education
 
@@ -93,6 +96,10 @@ Do not use it for general programming help, live availability or pricing quotes 
 ## Achievements
 
 - [Achievements](https://arunsanjeev.dev/#achievements): 11 awards, including wins at Hexaware AI Innovation League (HAIL 2026), AI Ascend 2026 (AWS & Kyndryl), Prathiyogitha Volume 2, GenCraft 2026 Hackathon and Appathon, and runner-up at MKCE HackFest 2026.
+
+## Hackathons
+
+- [Hackathons](https://arunsanjeev.dev/hackathons/): six hackathon and appathon wins in 2025-2026, most with Team Cyber Assaulterz. Solo winner of the Hexaware AI Innovation League (HAIL 2026) among 500+ participants; 1st prize at AI Ascend 2026 (powered by Kyndryl and AWS, ₹30,000) and Prathiyogitha Vol 2 at Kongu Engineering College (₹10,000); winner of the Thiran 2026 Appathon and of Hackspire and Appthon at Gencraft 2025; runner-up at Hackfest 2026 (36 hours). Also competed at Build for Bangalore (Google Developer Groups, 30 hours) and HackPrix Season 3 (Major League Hacking, 36 hours, Hyderabad).
 
 ## Publications
 

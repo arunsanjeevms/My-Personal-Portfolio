@@ -293,7 +293,7 @@ setupMobileServiceMarquee();
 
 
 
-// lazy text reveal for resume, projects and blog
+// lazy text reveal for resume, projects, hackathons and blog
 const setupLazyReveal = function (pageSelector, targetSelector, watchDynamic = false) {
   const page = document.querySelector(pageSelector);
   if (!page) return;
@@ -370,6 +370,7 @@ const setupLazyReveal = function (pageSelector, targetSelector, watchDynamic = f
 
 setupLazyReveal(".resume[data-page='resume']", ".timeline-item, .skills-title, .skills-item");
 setupLazyReveal(".projects[data-page='projects']", ".project-item.active", true);
+setupLazyReveal(".hackathons[data-page='hackathons']", ".hackathon-item");
 setupLazyReveal(".blog[data-page='blog']", ".blog-post-item", true);
 
 

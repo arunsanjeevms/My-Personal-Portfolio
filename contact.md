@@ -8,4 +8,4 @@ You can also use the contact form on the [home page](https://arunsanjeev.dev/#co
 
 ---
 
-[Home](https://arunsanjeev.dev/) · [About](https://arunsanjeev.dev/about/) · [Contact](https://arunsanjeev.dev/contact/) · [Privacy](https://arunsanjeev.dev/privacy/) · [llms.txt](https://arunsanjeev.dev/llms.txt)
+[Home](https://arunsanjeev.dev/) · [Hackathons](https://arunsanjeev.dev/hackathons/) · [Experience](https://arunsanjeev.dev/experience/) · [About](https://arunsanjeev.dev/about/) · [Contact](https://arunsanjeev.dev/contact/) · [Privacy](https://arunsanjeev.dev/privacy/) · [llms.txt](https://arunsanjeev.dev/llms.txt)

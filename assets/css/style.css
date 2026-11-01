@@ -1361,6 +1361,15 @@ main {
   margin-bottom: 7px;
 }
 
+.timeline-item-title a {
+  display: inline;
+  color: var(--orange-yellow-crayola);
+  transition: var(--transition-1);
+}
+
+.timeline-item-title a:hover,
+.timeline-item-title a:focus-visible { text-decoration: underline; }
+
 .timeline-list span {
   color: var(--vegas-gold);
   font-weight: var(--fw-400);
@@ -1459,6 +1468,7 @@ main {
 
 .resume .scroll-reveal,
 .projects .scroll-reveal,
+.hackathons .scroll-reveal,
 .blog .scroll-reveal {
   opacity: 0;
   transform: translateY(14px);
@@ -1467,6 +1477,7 @@ main {
 
 .resume .scroll-reveal.is-visible,
 .projects .scroll-reveal.is-visible,
+.hackathons .scroll-reveal.is-visible,
 .blog .scroll-reveal.is-visible {
   animation: textLoadIn 0.68s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   animation-delay: var(--reveal-delay, 0s);
@@ -1475,9 +1486,11 @@ main {
 @media (prefers-reduced-motion: reduce) {
   .resume .scroll-reveal,
   .projects .scroll-reveal,
+  .hackathons .scroll-reveal,
   .blog .scroll-reveal,
   .resume .scroll-reveal.is-visible,
   .projects .scroll-reveal.is-visible,
+  .hackathons .scroll-reveal.is-visible,
   .blog .scroll-reveal.is-visible {
     animation: none !important;
     opacity: 1 !important;
@@ -1651,6 +1664,194 @@ main {
   color: var(--light-gray-70);
   font-size: var(--fs-6);
   font-weight: var(--fw-300);
+}
+
+
+
+
+
+/*-----------------------------------*\
+  #HACKATHONS
+\*-----------------------------------*/
+
+.hackathon-section { margin-bottom: 10px; }
+
+.hackathon-intro { margin-bottom: 25px; }
+
+.hackathon-eyebrow {
+  color: var(--vegas-gold);
+  font-size: var(--fs-8);
+  font-weight: var(--fw-500);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 6px;
+}
+
+.hackathon-heading {
+  color: var(--white-2);
+  font-size: var(--fs-1);
+  font-weight: var(--fw-600);
+  line-height: 1.2;
+}
+
+.hackathon-heading span {
+  display: inline;
+  background: var(--text-gradient-yellow);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-style: italic;
+}
+
+.hackathon-note {
+  color: var(--light-gray-70);
+  font-size: var(--fs-6);
+  font-weight: var(--fw-300);
+  margin-top: 8px;
+}
+
+/* equal-height rows so every card renders at the same size */
+.hackathon-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-auto-rows: 1fr;
+  gap: 20px;
+}
+
+.hackathon-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  background: var(--border-gradient-onyx);
+  border-radius: 16px;
+  box-shadow: var(--shadow-4);
+  z-index: 1;
+}
+
+.hackathon-item::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: var(--eerie-black-1);
+  z-index: -1;
+}
+
+.hackathon-img {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--smoky-black);
+  margin-bottom: 14px;
+}
+
+/* contain, not cover: the posters carry names and titles near their edges */
+.hackathon-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: var(--transition-1);
+}
+
+.hackathon-item:hover .hackathon-img img { transform: scale(1.05); }
+
+.hackathon-img-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: hsla(0, 0%, 7%, 0.8);
+  backdrop-filter: blur(6px);
+  color: var(--orange-yellow-crayola);
+  font-size: var(--fs-8);
+  font-weight: var(--fw-500);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+  padding: 5px 10px;
+  border: 1px solid var(--jet);
+  border-radius: 999px;
+}
+
+.hackathon-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.hackathon-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.hackathon-badge,
+.hackathon-prize {
+  font-size: var(--fs-8);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  line-height: 1;
+  padding: 5px 9px;
+  border-radius: 999px;
+}
+
+.hackathon-badge {
+  background: var(--text-gradient-yellow);
+  color: var(--smoky-black);
+  font-weight: var(--fw-600);
+}
+
+.hackathon-prize {
+  color: var(--light-gray-70);
+  font-weight: var(--fw-500);
+  border: 1px solid var(--jet);
+}
+
+.hackathon-title {
+  color: var(--white-2);
+  font-size: var(--fs-5);
+  font-weight: var(--fw-500);
+  line-height: 1.3;
+  margin-bottom: 4px;
+  transition: var(--transition-1);
+}
+
+.hackathon-item:hover .hackathon-title { color: var(--orange-yellow-crayola); }
+
+.hackathon-organizer {
+  color: var(--light-gray-70);
+  font-size: var(--fs-7);
+  font-weight: var(--fw-300);
+  margin-bottom: 10px;
+}
+
+.hackathon-organizer b,
+.hackathon-text b {
+  color: var(--light-gray);
+  font-weight: var(--fw-500);
+}
+
+.hackathon-text {
+  color: var(--light-gray);
+  font-size: var(--fs-7);
+  font-weight: var(--fw-300);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+.hackathon-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--jet);
+  color: var(--light-gray-70);
+  font-size: var(--fs-8);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
 }
 
 
@@ -2299,6 +2500,19 @@ textarea.form-input::-webkit-resizer { display: none; }
 
   .project-list { grid-template-columns: 1fr 1fr; }
 
+  /* one card per row: photo on the left, details on the right */
+  .hackathon-item {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 22px;
+    padding: 14px;
+  }
+
+  .hackathon-img {
+    align-self: center;
+    margin-bottom: 0;
+  }
+
   .blog-posts-list { grid-template-columns: 1fr; }
 
 
@@ -2425,6 +2639,8 @@ textarea.form-input::-webkit-resizer { display: none; }
    */
 
   .project-list { grid-template-columns: repeat(3, 1fr); }
+
+  .hackathon-item { grid-template-columns: 280px 1fr; }
 
 
 
@@ -2592,6 +2808,13 @@ textarea.form-input::-webkit-resizer { display: none; }
     font-size: 18px;
     padding: 6px;
   }
+}
+
+/* Narrow phones (≤400px): keep all six nav links on one row */
+@media (max-width: 400px) {
+  .navbar-list { padding: 0 4px; }
+
+  .navbar-link { padding-inline: 4px; }
 }
 
 /* Mobile (≤480px) */

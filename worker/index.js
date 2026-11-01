@@ -5,6 +5,8 @@
 const MARKDOWN_PAGES = {
   '/': '/index.md',
   '/about': '/about.md',
+  '/hackathons': '/hackathons.md',
+  '/experience': '/experience.md',
   '/contact': '/contact.md',
   '/privacy': '/privacy.md',
 };

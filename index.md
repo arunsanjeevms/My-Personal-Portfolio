@@ -6,7 +6,8 @@ This is the Markdown version of the portfolio home page https://arunsanjeev.dev/
 
 ## Roles (2026)
 
-- Co-founder and Software Developer, Triospark IT Solutions
+- Founder, [Aalvinai Technologies](https://aalvinai.in/)
+- Co-founder and Software Developer, [Triospark IT Solutions](https://triospark.in/)
 - Associate Student Ambassador, Microsoft
 - Core Team Member, AWS Student Builder Group
 - Vice Chair, IEEE Systems, Man, and Cybernetics Society
@@ -32,6 +33,7 @@ The full list of 34 projects is in [llms.txt](https://arunsanjeev.dev/llms.txt).
 
 ## Achievements and publications
 
+- Full hackathon record: [Hackathons](https://arunsanjeev.dev/hackathons/); roles and dates: [Experience](https://arunsanjeev.dev/experience/)
 - Winner: Hexaware AI Innovation League (HAIL 2026), AI Ascend 2026 (AWS & Kyndryl), GenCraft 2026 Hackathon, Appathon, Prathiyogitha Volume 2; runner-up at MKCE HackFest 2026
 - Publication: DIGSAFE: 5G-Based Smart Helmet for Proactive Worker Safety using XAI, IEEE ICCTAC 2026 (IEEE Xplore ID 11524539)
 - 17 certifications including Microsoft Certified: Azure Fundamentals and GitHub Foundations
@@ -44,4 +46,4 @@ The full list of 34 projects is in [llms.txt](https://arunsanjeev.dev/llms.txt).
 
 ---
 
-[About](https://arunsanjeev.dev/about/) · [Contact](https://arunsanjeev.dev/contact/) · [Privacy](https://arunsanjeev.dev/privacy/) · [llms.txt](https://arunsanjeev.dev/llms.txt) · [Sitemap](https://arunsanjeev.dev/sitemap.xml)
+[Hackathons](https://arunsanjeev.dev/hackathons/) · [Experience](https://arunsanjeev.dev/experience/) · [About](https://arunsanjeev.dev/about/) · [Contact](https://arunsanjeev.dev/contact/) · [Privacy](https://arunsanjeev.dev/privacy/) · [llms.txt](https://arunsanjeev.dev/llms.txt) · [Sitemap](https://arunsanjeev.dev/sitemap.xml)

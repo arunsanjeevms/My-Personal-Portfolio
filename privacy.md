@@ -10,4 +10,4 @@ arunsanjeev.dev is a personal portfolio operated by M S Arun Sanjeev. It does no
 
 ---
 
-[Home](https://arunsanjeev.dev/) · [About](https://arunsanjeev.dev/about/) · [Contact](https://arunsanjeev.dev/contact/) · [Privacy](https://arunsanjeev.dev/privacy/) · [llms.txt](https://arunsanjeev.dev/llms.txt)
+[Home](https://arunsanjeev.dev/) · [Hackathons](https://arunsanjeev.dev/hackathons/) · [Experience](https://arunsanjeev.dev/experience/) · [About](https://arunsanjeev.dev/about/) · [Contact](https://arunsanjeev.dev/contact/) · [Privacy](https://arunsanjeev.dev/privacy/) · [llms.txt](https://arunsanjeev.dev/llms.txt)
