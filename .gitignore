@@ -1,0 +1,6 @@
+# Wrangler local state and secrets: never commit
+.wrangler/
+.dev.vars
+.dev.vars.*
+.env
+node_modules/

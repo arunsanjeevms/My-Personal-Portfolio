@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="sb-title">
+  <title id="sb-title">Skiddy Bot</title>
+  <defs>
+    <linearGradient id="sb-neon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00f0ff"/>
+      <stop offset="1" stop-color="#39ff88"/>
+    </linearGradient>
+    <linearGradient id="sb-shell" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1b2330"/>
+      <stop offset="1" stop-color="#0b0f16"/>
+    </linearGradient>
+    <filter id="sb-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <style>
+      .eye { transform-box: fill-box; transform-origin: center; animation: blink 5s infinite; }
+      .led { animation: pulse 2.4s ease-in-out infinite; }
+      @keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.15); } }
+      @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+      @media (prefers-reduced-motion: reduce) { .eye, .led { animation: none; } }
+    </style>
+  </defs>
+
+  <!-- antenna -->
+  <path d="M32 15V8" stroke="url(#sb-neon)" stroke-width="2.4" stroke-linecap="round"/>
+  <circle class="led" cx="32" cy="6" r="3.2" fill="#ffd36e" filter="url(#sb-glow)"/>
+
+  <!-- ears / side ports -->
+  <rect x="4.5" y="28" width="6" height="14" rx="2.5" fill="url(#sb-neon)"/>
+  <rect x="53.5" y="28" width="6" height="14" rx="2.5" fill="url(#sb-neon)"/>
+
+  <!-- head -->
+  <rect x="10" y="15" width="44" height="41" rx="12" fill="url(#sb-shell)" stroke="url(#sb-neon)" stroke-width="2.4"/>
+
+  <!-- circuit traces -->
+  <path d="M14 22h5l3 3M50 22h-5l-3 3" stroke="#00f0ff" stroke-opacity=".45" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <circle cx="14" cy="22" r="1.2" fill="#00f0ff" fill-opacity=".7"/>
+  <circle cx="50" cy="22" r="1.2" fill="#00f0ff" fill-opacity=".7"/>
+
+  <!-- visor -->
+  <rect x="16" y="27" width="32" height="13" rx="6.5" fill="#05080d" stroke="#00f0ff" stroke-opacity=".55" stroke-width="1.2"/>
+
+  <!-- eyes -->
+  <g filter="url(#sb-glow)" fill="#00f0ff">
+    <rect class="eye" x="21.5" y="30.5" width="7" height="6" rx="2"/>
+    <rect class="eye" x="35.5" y="30.5" width="7" height="6" rx="2"/>
+  </g>
+
+  <!-- mouth: terminal prompt >_ -->
+  <g stroke="#39ff88" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#sb-glow)">
+    <path d="M25 44.5l3.5 3-3.5 3"/>
+    <path d="M31.5 50.5h8"/>
+  </g>
+</svg>

@@ -2,3 +2,15 @@ name = "arunsanjeev-dev-negotiation"
 main = "worker/index.js"
 compatibility_date = "2026-10-01"
 routes = [{ pattern = "arunsanjeev.dev/*", zone_name = "arunsanjeev.dev" }]
+
+# Skiddy Bot (POST /api/chat). The Gemini key is a secret, never put it here:
+#   npx wrangler secret put GEMINI_API_KEY
+[vars]
+CHAT_MODELS = "gemini-3.5-flash,gemini-3.5-flash-lite,gemini-3.1-flash-lite"
+CHAT_ALLOWED_ORIGINS = "https://arunsanjeev.dev"
+
+# Per-IP limit for /api/chat: 10 messages per 60 seconds.
+[[ratelimits]]
+name = "CHAT_LIMITER"
+namespace_id = "7001"
+simple = { limit = 10, period = 60 }

@@ -1,6 +1,9 @@
 // Cloudflare Worker for arunsanjeev.dev (GitHub Pages origin).
-// Adds Markdown content negotiation (Accept: text/markdown) and Markdown 404s.
+// Adds Markdown content negotiation (Accept: text/markdown), Markdown 404s,
+// and the Skiddy Bot chat API at POST /api/chat (see chat.js).
 // Deploy with `npx wrangler deploy` (see wrangler.toml); route arunsanjeev.dev/*.
+
+import { handleChat } from './chat.js';
 
 const MARKDOWN_PAGES = {
   '/': '/index.md',
@@ -51,8 +54,10 @@ function markdownResponse(origin, status) {
   });
 }
 
-export async function handle(request, fetchOrigin = fetch) {
+export async function handle(request, fetchOrigin = fetch, env = {}) {
   const url = new URL(request.url);
+  if (url.pathname === '/api/chat') return handleChat(request, env, fetchOrigin);
+
   const wantsMarkdown =
     (request.method === 'GET' || request.method === 'HEAD') && prefersMarkdown(request.headers.get('Accept'));
   // Files with an extension (css, js, images, llms.txt, ...) are never negotiated.
@@ -77,5 +82,5 @@ export async function handle(request, fetchOrigin = fetch) {
 }
 
 export default {
-  fetch: (request) => handle(request),
+  fetch: (request, env) => handle(request, fetch, env),
 };
